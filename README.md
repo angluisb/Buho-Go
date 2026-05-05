@@ -32,6 +32,10 @@ pip install -r requirements.txt
 
 # 4. Configurar variables de entorno
 cp .env.example .env
+
+# Windows (PowerShell)
+copy .env.example .env
+
 # Edita .env con tu SECRET_KEY
 
 # 5. Aplicar migraciones
