@@ -19,7 +19,7 @@ Plataforma para que estudiantes de la Universidad de Sonora realicen pedidos ant
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/TU_USUARIO/buho-go.git
+git clone https://github.com/angluisb/buho-go.git
 cd buho-go
 
 # 2. Crear entorno virtual
