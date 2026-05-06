@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ establecimiento.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>{{ establecimiento.nombre }}</h4>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ establecimiento.descripcion }}</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Dirección:</strong><br>{{ establecimiento.direccion }}</p>
+                            {% if establecimiento.telefono %}
+                                <p><strong>Teléfono:</strong><br>{{ establecimiento.telefono }}</p>
+                            {% endif %}
+                            {% if establecimiento.email %}
+                                <p><strong>Email:</strong><br>{{ establecimiento.email }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Productos Disponibles</h4>
+                </div>
+                <div class="card-body">
+                    {% if productos %}
+                        <div class="row">
+                            {% for producto in productos %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ producto.nombre }}</h6>
+                                            <p class="card-text">{{ producto.descripcion|truncatechars:80 }}</p>
+                                            <h5 class="text-success">${{ producto.precio }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No hay productos disponibles en este establecimiento.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Acciones</h4>
+                </div>
+                <div class="card-body">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'pedidos:crear_pedido' establecimiento.pk %}" class="btn btn-success btn-lg btn-block">
+                            <i class="fas fa-shopping-cart"></i> Hacer Pedido Anticipado
+                        </a>
+                        <p class="text-muted mt-2">
+                            <small>Tu pedido estará listo cuando llegues al establecimiento.</small>
+                        </p>
+                    {% else %}
+                        <p>Para hacer un pedido, necesitas <a href="#">iniciar sesión</a> o <a href="#">registrarte</a>.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user.is_authenticated %}
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <a href="{% url 'pedidos:mis_pedidos' %}" class="btn btn-outline-primary btn-block">
+                            <i class="fas fa-list"></i> Ver Mis Pedidos
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

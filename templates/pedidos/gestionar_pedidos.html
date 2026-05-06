@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestionar Pedidos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Gestionar Pedidos</h1>
+
+    {% if pedidos %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Establecimiento</th>
+                        <th>Estado</th>
+                        <th>Tipo Entrega</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos %}
+                        <tr>
+                            <td>{{ pedido.id }}</td>
+                            <td>{{ pedido.usuario.email }}</td>
+                            <td>{{ pedido.establecimiento.nombre }}</td>
+                            <td>
+                                <span class="badge
+                                    {% if pedido.estado == 'recibido' %}badge-secondary
+                                    {% elif pedido.estado == 'en_preparacion' %}badge-warning
+                                    {% elif pedido.estado == 'listo' %}badge-success
+                                    {% elif pedido.estado == 'entregado' %}badge-info
+                                    {% else %}badge-danger{% endif %}">
+                                    {{ pedido.get_estado_display }}
+                                </span>
+                            </td>
+                            <td>{{ pedido.get_tipo_entrega_display }}</td>
+                            <td>${{ pedido.precio_total }}</td>
+                            <td>{{ pedido.creado_en|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'pedidos:detalle_pedido' pedido.pk %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                {% if pedido.estado != 'entregado' and pedido.estado != 'cancelado' %}
+                                    <a href="{% url 'pedidos:actualizar_estado' pedido.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Actualizar Estado
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+            <nav aria-label="Navegación de pedidos">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">
+            <h4>No hay pedidos para gestionar</h4>
+            <p>No hay pedidos pendientes en este momento.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

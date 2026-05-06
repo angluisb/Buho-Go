@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Establecimientos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Establecimientos Disponibles</h1>
+
+    {% if establecimientos %}
+        <div class="row">
+            {% for establecimiento in establecimientos %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ establecimiento.nombre }}</h5>
+                            <p class="card-text">{{ establecimiento.descripcion|truncatechars:100 }}</p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> {{ establecimiento.direccion }}
+                                </small>
+                            </p>
+                            {% if establecimiento.telefono %}
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-phone"></i> {{ establecimiento.telefono }}
+                                    </small>
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'establecimientos:detalle_establecimiento' establecimiento.pk %}" class="btn btn-primary">
+                                <i class="fas fa-eye"></i> Ver Productos
+                            </a>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'pedidos:crear_pedido' establecimiento.pk %}" class="btn btn-success">
+                                    <i class="fas fa-shopping-cart"></i> Hacer Pedido
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+            <nav aria-label="Navegación de establecimientos">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">
+            <h4>No hay establecimientos disponibles</h4>
+            <p>No hay establecimientos activos en este momento.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
