@@ -207,7 +207,7 @@
 <section class="restaurant-hero">
 
     <img
-        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1600"
+        src="{% if establecimiento.imagen %}{{ establecimiento.imagen.url }}{% else %}https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1600{% endif %}"
         alt="{{ establecimiento.nombre }}"
     >
 
@@ -292,13 +292,20 @@
 
             <div class="d-flex justify-content-between align-items-center mb-4">
 
-                <h2 class="section-title mb-0">
-                    Productos
-                </h2>
+                <div>
+                    <h2 class="section-title mb-0">
+                        Productos
+                    </h2>
+                    <span class="text-muted">
+                        {{ productos|length }} disponibles
+                    </span>
+                </div>
 
-                <span class="text-muted">
-                    {{ productos|length }} disponibles
-                </span>
+                {% if user.is_authenticated and user.tipo == 'comercio' and establecimiento.propietario == user %}
+                <a href="{% url 'establecimientos:crear_producto' establecimiento.id %}" class="btn btn-outline-success">
+                    <i class="fas fa-plus me-2"></i> Agregar Producto
+                </a>
+                {% endif %}
 
             </div>
 
@@ -313,8 +320,9 @@
                     <div class="product-card">
 
                         <img
-                            src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1200"
+                            src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1200{% endif %}"
                             class="product-image"
+                            alt="{{ producto.nombre }}"
                         >
 
                         <div class="product-body">
