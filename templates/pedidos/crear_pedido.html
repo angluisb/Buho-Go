@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Crear Pedido - {{ establecimiento.nombre }}
+Confirmar Pedido - {{ establecimiento.nombre }}
 {% endblock %}
 
 {% block extra_head %}
@@ -55,11 +55,6 @@ Crear Pedido - {{ establecimiento.nombre }}
         padding: 20px;
         margin-bottom: 20px;
         border: 1px solid #eee;
-        transition: .2s;
-    }
-
-    .product-item:hover{
-        border-color: #ff6b00;
     }
 
     .form-control,
@@ -87,27 +82,6 @@ Crear Pedido - {{ establecimiento.nombre }}
     .btn-main:hover{
         background: black;
         color: white;
-    }
-
-    .btn-orange{
-        background: #ff6b00;
-        color: white;
-        border-radius: 18px;
-        padding: 14px 22px;
-        border: none;
-        font-weight: 700;
-    }
-
-    .btn-orange:hover{
-        background: #e55f00;
-        color: white;
-    }
-
-    .btn-delete{
-        width: 48px;
-        height: 48px;
-        border-radius: 16px;
-        border: none;
     }
 
     .summary-card{
@@ -176,11 +150,11 @@ Crear Pedido - {{ establecimiento.nombre }}
     <div class="container">
 
         <h1 class="pedido-title">
-            Haz tu pedido 🍔
+            Confirma tu Pedido 🎉
         </h1>
 
         <p class="pedido-subtitle mt-3">
-            Ordena tus productos favoritos de {{ establecimiento.nombre }}
+            {{ establecimiento.nombre }}
         </p>
 
     </div>
@@ -200,76 +174,46 @@ Crear Pedido - {{ establecimiento.nombre }}
 
                     {% csrf_token %}
 
-                    <!-- PRODUCTS -->
-                    <div class="card-section">
-
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-
-                            <h3 class="section-title mb-0">
-                                Productos
-                            </h3>
-
-                            <button
-                                type="button"
-                                class="btn btn-orange"
-                                onclick="agregarProducto()"
-                            >
-                                <i class="fas fa-plus me-2"></i>
-                                Agregar
-                            </button>
-
-                        </div>
-
-                        <div id="productosContainer"></div>
-
-                    </div>
-
-                    <!-- USER INFO -->
+                    <!-- ITEMS DEL CARRITO -->
                     <div class="card-section">
 
                         <h3 class="section-title">
-                            Datos del Cliente
+                            Items del Pedido
                         </h3>
 
-                        {% if not user.is_authenticated %}
+                        {% for item in carrito_items %}
+                        <div class="product-item">
 
-                        <div class="mb-3">
+                            <div class="row align-items-center">
 
-                            <label class="form-label fw-semibold">
-                                Nombre completo
-                            </label>
+                                <div class="col">
 
-                            {{ pedido_form.cliente_nombre }}
+                                    <div class="fw-bold">
+                                        {{ item.producto.nombre }}
+                                    </div>
 
-                        </div>
+                                    <div class="text-muted small mt-1">
+                                        Cantidad: <strong>{{ item.cantidad }}</strong>
+                                    </div>
 
-                        <div class="mb-3">
+                                    <div class="text-muted small">
+                                        Precio unitario: <strong>${{ item.producto.precio }}</strong>
+                                    </div>
 
-                            <label class="form-label fw-semibold">
-                                Correo electrónico
-                            </label>
+                                </div>
 
-                            {{ pedido_form.cliente_email }}
+                                <div class="col-auto text-end">
 
-                        </div>
+                                    <div style="font-size: 1.3rem; font-weight: 800; color: #ff6b00;">
+                                        ${{ item.subtotal }}
+                                    </div>
 
-                        {% else %}
+                                </div>
 
-                        <div class="user-alert">
-
-                            <i class="fas fa-user-circle me-2"></i>
-
-                            Pedido realizado por:
-
-                            <strong>
-                                {{ user.first_name }} {{ user.last_name }}
-                            </strong>
-
-                            ({{ user.email }})
+                            </div>
 
                         </div>
-
-                        {% endif %}
+                        {% endfor %}
 
                     </div>
 
@@ -293,10 +237,33 @@ Crear Pedido - {{ establecimiento.nombre }}
                         <div>
 
                             <label class="form-label fw-semibold">
-                                Notas adicionales
+                                Notas adicionales (opcional)
                             </label>
 
                             {{ pedido_form.notas }}
+
+                        </div>
+
+                    </div>
+
+                    <!-- USER INFO -->
+                    <div class="card-section">
+
+                        <h3 class="section-title">
+                            Cliente
+                        </h3>
+
+                        <div class="user-alert">
+
+                            <i class="fas fa-user-circle me-2"></i>
+
+                            <strong>
+                                {{ user.first_name }} {{ user.last_name }}
+                            </strong>
+
+                            <div class="small mt-1">
+                                {{ user.email }}
+                            </div>
 
                         </div>
 
@@ -313,8 +280,8 @@ Crear Pedido - {{ establecimiento.nombre }}
                                     type="submit"
                                     class="btn btn-main w-100"
                                 >
-                                    <i class="fas fa-shopping-bag me-2"></i>
-                                    Confirmar Pedido
+                                    <i class="fas fa-check me-2"></i>
+                                    Confirmar y Pedir
                                 </button>
 
                             </div>
@@ -326,7 +293,7 @@ Crear Pedido - {{ establecimiento.nombre }}
                                     class="btn btn-outline-dark w-100 btn-main bg-white text-dark"
                                 >
                                     <i class="fas fa-arrow-left me-2"></i>
-                                    Volver
+                                    Volver al Carrito
                                 </a>
 
                             </div>
@@ -347,23 +314,24 @@ Crear Pedido - {{ establecimiento.nombre }}
             <div class="summary-card">
 
                 <h3 class="summary-title mb-4">
-                    Resumen
+                    Resumen del Pedido
                 </h3>
 
-                <div id="resumenPedido">
-
-                    <p class="text-muted">
-                        No hay productos seleccionados
-                    </p>
-
+                {% for item in carrito_items %}
+                <div class="summary-item">
+                    <span>{{ item.producto.nombre }} x {{ item.cantidad }}</span>
+                    <strong>${{ item.subtotal }}</strong>
                 </div>
+                {% endfor %}
+
+                <hr class="my-3">
 
                 <div class="total-box">
 
                     <div class="d-flex justify-content-between align-items-center">
 
                         <div>
-                            <div>Total</div>
+                            <div>Total a Pagar</div>
 
                             <div class="small opacity-75">
                                 Incluye impuestos
@@ -371,11 +339,16 @@ Crear Pedido - {{ establecimiento.nombre }}
                         </div>
 
                         <div class="total-price">
-                            $<span id="totalPedido">0.00</span>
+                            ${{ carrito_total }}
                         </div>
 
                     </div>
 
+                </div>
+
+                <div class="alert alert-info border-0 rounded mt-4" style="font-size: 0.9rem;">
+                    <i class="fas fa-info-circle me-2"></i>
+                    El pedido será confirmado después de completar el formulario.
                 </div>
 
             </div>
@@ -385,181 +358,5 @@ Crear Pedido - {{ establecimiento.nombre }}
     </div>
 
 </div>
-
-<script>
-
-let productoIndex = 0;
-
-function agregarProducto() {
-
-    const container = document.getElementById('productosContainer');
-
-    const div = document.createElement('div');
-
-    div.className = 'product-item';
-
-    div.innerHTML = `
-
-        <div class="row align-items-end g-3">
-
-            <div class="col-md-6">
-
-                <label class="form-label fw-semibold">
-                    Producto
-                </label>
-
-                <select
-                    name="producto_${productoIndex}"
-                    class="form-select"
-                    onchange="actualizarResumen()"
-                >
-
-                    <option value="">
-                        Selecciona un producto
-                    </option>
-
-                    {% for producto in productos %}
-
-                    <option
-                        value="{{ producto.id }}"
-                        data-precio="{{ producto.precio }}"
-                        data-nombre="{{ producto.nombre }}"
-                    >
-                        {{ producto.nombre }} - ${{ producto.precio }}
-                    </option>
-
-                    {% endfor %}
-
-                </select>
-
-            </div>
-
-            <div class="col-md-4">
-
-                <label class="form-label fw-semibold">
-                    Cantidad
-                </label>
-
-                <input
-                    type="number"
-                    min="1"
-                    value="1"
-                    name="cantidad_${productoIndex}"
-                    class="form-control"
-                    onchange="actualizarResumen()"
-                >
-
-            </div>
-
-            <div class="col-md-2">
-
-                <button
-                    type="button"
-                    class="btn btn-danger btn-delete w-100"
-                    onclick="eliminarProducto(this)"
-                >
-                    <i class="fas fa-trash"></i>
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
-
-    container.appendChild(div);
-
-    productoIndex++;
-
-    actualizarResumen();
-
-}
-
-function eliminarProducto(button){
-
-    button.closest('.product-item').remove();
-
-    actualizarResumen();
-
-}
-
-function actualizarResumen(){
-
-    const resumen = document.getElementById('resumenPedido');
-
-    const totalSpan = document.getElementById('totalPedido');
-
-    let total = 0;
-
-    let html = '';
-
-    const productosSeleccionados = document.querySelectorAll('.product-item');
-
-    productosSeleccionados.forEach(item => {
-
-        const select = item.querySelector('select');
-
-        const cantidadInput = item.querySelector('input');
-
-        if(select.value){
-
-            const option = select.selectedOptions[0];
-
-            const nombre = option.getAttribute('data-nombre');
-
-            const precio = parseFloat(option.getAttribute('data-precio'));
-
-            const cantidad = parseInt(cantidadInput.value);
-
-            const subtotal = precio * cantidad;
-
-            total += subtotal;
-
-            html += `
-
-                <div class="summary-item">
-
-                    <div>
-                        <strong>${nombre}</strong>
-                        <div class="text-muted small">
-                            ${cantidad} x $${precio.toFixed(2)}
-                        </div>
-                    </div>
-
-                    <div>
-                        $${subtotal.toFixed(2)}
-                    </div>
-
-                </div>
-
-            `;
-
-        }
-
-    });
-
-    if(html === ''){
-
-        html = `
-            <p class="text-muted">
-                No hay productos seleccionados
-            </p>
-        `;
-
-    }
-
-    resumen.innerHTML = html;
-
-    totalSpan.textContent = total.toFixed(2);
-
-}
-
-document.addEventListener('DOMContentLoaded', function(){
-
-    agregarProducto();
-
-});
-
-</script>
 
 {% endblock %}

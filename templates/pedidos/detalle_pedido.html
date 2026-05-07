@@ -1,101 +1,466 @@
 {% extends 'base.html' %}
 
-{% block title %}Detalle del Pedido #{{ pedido.id }}{% endblock %}
+{% block title %}
+Pedido #{{ pedido.id }} | Buho Go
+{% endblock %}
+
+{% block extra_head %}
+
+<style>
+
+    body{
+        background: #f5f5f7;
+    }
+
+    .pedido-header{
+        background: linear-gradient(135deg,#ff6b00,#ff8f00);
+        border-radius: 35px;
+        padding: 45px;
+        color: white;
+        margin-bottom: 35px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .pedido-header::before{
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.08);
+        top: -100px;
+        right: -100px;
+    }
+
+    .pedido-title{
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .pedido-date{
+        opacity: .9;
+        font-size: 1rem;
+    }
+
+    .card-custom{
+        background: white;
+        border: none;
+        border-radius: 30px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.05);
+        margin-bottom: 25px;
+    }
+
+    .section-title{
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-bottom: 25px;
+        color: #111;
+    }
+
+    .info-label{
+        font-size: .9rem;
+        color: gray;
+        margin-bottom: 4px;
+    }
+
+    .info-value{
+        font-weight: 700;
+        color: #111;
+        margin-bottom: 20px;
+    }
+
+    .status-badge{
+        display: inline-block;
+        padding: 10px 18px;
+        border-radius: 50px;
+        font-size: .85rem;
+        font-weight: 700;
+    }
+
+    .status-recibido{
+        background: #ececec;
+        color: #555;
+    }
+
+    .status-preparacion{
+        background: #fff4db;
+        color: #b77900;
+    }
+
+    .status-listo{
+        background: #e8fff1;
+        color: #00a650;
+    }
+
+    .status-entregado{
+        background: #e7f1ff;
+        color: #0066ff;
+    }
+
+    .status-cancelado{
+        background: #ffe8e8;
+        color: #d00000;
+    }
+
+    .product-item{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .product-item:last-child{
+        border-bottom: none;
+    }
+
+    .product-name{
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .product-detail{
+        font-size: .92rem;
+        color: gray;
+    }
+
+    .product-price{
+        font-weight: 800;
+        color: #ff6b00;
+        font-size: 1rem;
+    }
+
+    .total-box{
+        background: #111;
+        border-radius: 24px;
+        padding: 25px;
+        color: white;
+        margin-top: 25px;
+    }
+
+    .total-label{
+        opacity: .8;
+    }
+
+    .total-price{
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .progress{
+        height: 14px;
+        border-radius: 50px;
+        background: #ececec;
+        overflow: hidden;
+    }
+
+    .progress-bar{
+        border-radius: 50px;
+        font-size: .8rem;
+        font-weight: 700;
+    }
+
+    .alert-custom{
+        border: none;
+        border-radius: 20px;
+        padding: 18px;
+        font-weight: 600;
+    }
+
+    .btn-back{
+        width: 100%;
+        border-radius: 16px;
+        padding: 14px;
+        font-weight: 700;
+        border: none;
+        background: #111;
+    }
+
+    .notes-box{
+        background: #fafafa;
+        border-radius: 18px;
+        padding: 18px;
+        color: #666;
+        line-height: 1.7;
+    }
+
+</style>
+
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Pedido #{{ pedido.id }}</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Información del Pedido</h6>
-                            <p><strong>Establecimiento:</strong> {{ pedido.establecimiento.nombre }}</p>
-                            <p><strong>Estado:</strong>
-                                <span class="badge
-                                    {% if pedido.estado == 'recibido' %}badge-secondary
-                                    {% elif pedido.estado == 'en_preparacion' %}badge-warning
-                                    {% elif pedido.estado == 'listo' %}badge-success
-                                    {% elif pedido.estado == 'entregado' %}badge-info
-                                    {% else %}badge-danger{% endif %}">
-                                    {{ pedido.get_estado_display }}
-                                </span>
-                            </p>
-                            <p><strong>Tipo de entrega:</strong> {{ pedido.get_tipo_entrega_display }}</p>
-                            <p><strong>Fecha de creación:</strong> {{ pedido.creado_en|date:"d/m/Y H:i" }}</p>
-                            {% if pedido.actualizado_en != pedido.creado_en %}
-                                <p><strong>Última actualización:</strong> {{ pedido.actualizado_en|date:"d/m/Y H:i" }}</p>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Productos</h6>
-                            <ul class="list-group list-group-flush">
-                                {% for item in pedido.items.all %}
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ item.producto.nombre }}
-                                        <span class="badge badge-primary badge-pill">
-                                            {{ item.cantidad }} x ${{ item.precio_unitario }} = ${{ item.subtotal }}
-                                        </span>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                            <hr>
-                            <h5 class="text-right">Total: ${{ pedido.precio_total }}</h5>
-                        </div>
-                    </div>
 
-                    {% if pedido.notas %}
-                        <div class="mt-3">
-                            <h6>Notas:</h6>
-                            <p class="text-muted">{{ pedido.notas }}</p>
-                        </div>
-                    {% endif %}
+<div class="container py-5">
+
+    <!-- HEADER -->
+    <div class="pedido-header">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-8">
+
+                <h1 class="pedido-title">
+                    Pedido #{{ pedido.id }}
+                </h1>
+
+                <div class="pedido-date">
+                    Realizado el {{ pedido.creado_en|date:"d/m/Y H:i" }}
                 </div>
+
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Estado del Pedido</h5>
-                </div>
-                <div class="card-body">
-                    <div class="progress mb-3">
-                        {% if pedido.estado == 'recibido' %}
-                            <div class="progress-bar bg-secondary" style="width: 25%">Recibido</div>
-                        {% elif pedido.estado == 'en_preparacion' %}
-                            <div class="progress-bar bg-warning" style="width: 50%">En Preparación</div>
-                        {% elif pedido.estado == 'listo' %}
-                            <div class="progress-bar bg-success" style="width: 75%">Listo</div>
-                        {% elif pedido.estado == 'entregado' %}
-                            <div class="progress-bar bg-info" style="width: 100%">Entregado</div>
-                        {% endif %}
-                    </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
 
-                    {% if pedido.estado == 'listo' %}
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i> ¡Tu pedido está listo!
-                        </div>
+                <span class="status-badge
+                    
+                    {% if pedido.estado == 'recibido' %}
+                        status-recibido
+                    {% elif pedido.estado == 'en_preparacion' %}
+                        status-preparacion
+                    {% elif pedido.estado == 'listo' %}
+                        status-listo
                     {% elif pedido.estado == 'entregado' %}
-                        <div class="alert alert-info">
-                            <i class="fas fa-box-open"></i> Pedido entregado
-                        </div>
+                        status-entregado
+                    {% else %}
+                        status-cancelado
                     {% endif %}
-                </div>
+                
+                ">
+                    {{ pedido.get_estado_display }}
+                </span>
+
             </div>
 
-            <div class="card mt-3">
-                <div class="card-body">
-                    <a href="{% url 'pedidos:mis_pedidos' %}" class="btn btn-secondary btn-block">
-                        <i class="fas fa-arrow-left"></i> Volver a Mis Pedidos
-                    </a>
-                </div>
-            </div>
         </div>
+
     </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT -->
+        <div class="col-lg-8">
+
+            <!-- INFO -->
+            <div class="card-custom">
+
+                <h4 class="section-title">
+                    Información del pedido
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <div class="info-label">
+                            Restaurante
+                        </div>
+
+                        <div class="info-value">
+                            {{ pedido.establecimiento.nombre }}
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="info-label">
+                            Tipo de entrega
+                        </div>
+
+                        <div class="info-value">
+                            {{ pedido.get_tipo_entrega_display }}
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="info-label">
+                            Fecha de creación
+                        </div>
+
+                        <div class="info-value">
+                            {{ pedido.creado_en|date:"d/m/Y H:i" }}
+                        </div>
+
+                    </div>
+
+                    {% if pedido.actualizado_en != pedido.creado_en %}
+
+                    <div class="col-md-6">
+
+                        <div class="info-label">
+                            Última actualización
+                        </div>
+
+                        <div class="info-value">
+                            {{ pedido.actualizado_en|date:"d/m/Y H:i" }}
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <!-- PRODUCTS -->
+            <div class="card-custom">
+
+                <h4 class="section-title">
+                    Productos del pedido
+                </h4>
+
+                {% for item in pedido.items.all %}
+
+                <div class="product-item">
+
+                    <div>
+
+                        <div class="product-name">
+                            {{ item.producto.nombre }}
+                        </div>
+
+                        <div class="product-detail">
+                            {{ item.cantidad }} × ${{ item.precio_unitario }}
+                        </div>
+
+                    </div>
+
+                    <div class="product-price">
+                        ${{ item.subtotal }}
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+                <div class="total-box">
+
+                    <div class="total-label">
+                        Total del pedido
+                    </div>
+
+                    <div class="total-price">
+                        ${{ pedido.precio_total }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- NOTES -->
+            {% if pedido.notas %}
+
+            <div class="card-custom">
+
+                <h4 class="section-title">
+                    Notas adicionales
+                </h4>
+
+                <div class="notes-box">
+                    {{ pedido.notas }}
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-lg-4">
+
+            <!-- STATUS -->
+            <div class="card-custom">
+
+                <h4 class="section-title">
+                    Estado del pedido
+                </h4>
+
+                <div class="progress mb-4">
+
+                    {% if pedido.estado == 'recibido' %}
+
+                    <div class="progress-bar bg-secondary"
+                         style="width: 25%">
+                        25%
+                    </div>
+
+                    {% elif pedido.estado == 'en_preparacion' %}
+
+                    <div class="progress-bar bg-warning"
+                         style="width: 50%">
+                        50%
+                    </div>
+
+                    {% elif pedido.estado == 'listo' %}
+
+                    <div class="progress-bar bg-success"
+                         style="width: 75%">
+                        75%
+                    </div>
+
+                    {% elif pedido.estado == 'entregado' %}
+
+                    <div class="progress-bar bg-info"
+                         style="width: 100%">
+                        100%
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                {% if pedido.estado == 'recibido' %}
+
+                <div class="alert alert-secondary alert-custom">
+                    📥 Tu pedido fue recibido correctamente.
+                </div>
+
+                {% elif pedido.estado == 'en_preparacion' %}
+
+                <div class="alert alert-warning alert-custom">
+                    👨‍🍳 El restaurante está preparando tu pedido.
+                </div>
+
+                {% elif pedido.estado == 'listo' %}
+
+                <div class="alert alert-success alert-custom">
+                    ✅ Tu pedido está listo.
+                </div>
+
+                {% elif pedido.estado == 'entregado' %}
+
+                <div class="alert alert-info alert-custom">
+                    🚚 Pedido entregado exitosamente.
+                </div>
+
+                {% endif %}
+
+            </div>
+
+            <!-- BACK -->
+            <div class="card-custom">
+
+                <a href="{% url 'pedidos:mis_pedidos' %}"
+                   class="btn btn-dark btn-back">
+
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Volver a Mis Pedidos
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
 {% endblock %}

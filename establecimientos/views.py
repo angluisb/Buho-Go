@@ -2,34 +2,31 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from .models import Establecimiento, Producto
 
-from django.shortcuts import render
-from establecimientos.models import Establecimiento
-
-
-def home(request):
-
-    establecimientos = Establecimiento.objects.all()[:6]
-
-    productos = Producto.objects.all()[:8]
-
-    return render(request, 'home.html', {
-        'establecimientos': establecimientos,
-        'productos': productos
-    })
-
 
 def _get_carrito(request):
+    """Obtiene el carrito de la sesión"""
     return request.session.get('carrito', {'establecimiento': None, 'items': {}})
 
 
 def _carrito_items(request, establecimiento):
+    """Retorna los items del carrito y el total para un establecimiento específico"""
     carrito = _get_carrito(request)
+    
+    # Verificar que el carrito sea para este establecimiento
     if not carrito.get('establecimiento') or int(carrito.get('establecimiento')) != establecimiento.id:
         return [], 0
 
     items_data = carrito.get('items', {})
     producto_ids = [int(pid) for pid, qty in items_data.items() if qty and int(qty) > 0]
-    productos = Producto.objects.filter(id__in=producto_ids, establecimiento=establecimiento, disponible=True)
+    
+    if not producto_ids:
+        return [], 0
+    
+    productos = Producto.objects.filter(
+        id__in=producto_ids,
+        establecimiento=establecimiento,
+        disponible=True
+    )
 
     items = []
     total = 0
@@ -48,7 +45,19 @@ def _carrito_items(request, establecimiento):
     return items, total
 
 
+def home(request):
+    """Vista principal - lista establecimientos y productos destacados"""
+    establecimientos = Establecimiento.objects.filter(activo=True)[:6]
+    productos = Producto.objects.filter(disponible=True)[:8]
+
+    return render(request, 'home.html', {
+        'establecimientos': establecimientos,
+        'productos': productos
+    })
+
+
 class ListaEstablecimientosView(ListView):
+    """Lista todos los establecimientos activos"""
     model = Establecimiento
     template_name = 'establecimientos/lista_establecimientos.html'
     context_object_name = 'establecimientos'
@@ -59,6 +68,7 @@ class ListaEstablecimientosView(ListView):
 
 
 class DetalleEstablecimientoView(DetailView):
+    """Detalle de un establecimiento con productos y carrito"""
     model = Establecimiento
     template_name = 'establecimientos/detalle_establecimiento.html'
     context_object_name = 'establecimiento'
@@ -68,11 +78,17 @@ class DetalleEstablecimientoView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        establecimiento = self.get_object()
+        
+        # Obtener productos disponibles
         context['productos'] = Producto.objects.filter(
-            establecimiento=self.object,
+            establecimiento=establecimiento,
             disponible=True
         )
-        carrito_items, carrito_total = _carrito_items(self.request, self.object)
+        
+        # Obtener items del carrito para este establecimiento
+        carrito_items, carrito_total = _carrito_items(self.request, establecimiento)
         context['carrito_items'] = carrito_items
         context['carrito_total'] = carrito_total
+        
         return context

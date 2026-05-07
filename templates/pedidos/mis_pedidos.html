@@ -1,77 +1,399 @@
 {% extends 'base.html' %}
 
-{% block title %}Mis Pedidos{% endblock %}
+{% block title %}
+Mis Pedidos | Buho Go
+{% endblock %}
+
+{% block extra_head %}
+
+<style>
+
+    body{
+        background: #f5f5f7;
+    }
+
+    .page-header{
+        margin-bottom: 40px;
+    }
+
+    .page-title{
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #111;
+    }
+
+    .page-subtitle{
+        color: #777;
+        font-size: 1rem;
+    }
+
+    .pedido-card{
+        border: none;
+        border-radius: 28px;
+        overflow: hidden;
+        transition: .25s;
+        box-shadow: 0 10px 25px rgba(0,0,0,.05);
+        background: white;
+        height: 100%;
+    }
+
+    .pedido-card:hover{
+        transform: translateY(-6px);
+        box-shadow: 0 18px 40px rgba(0,0,0,.08);
+    }
+
+    .pedido-header{
+        background: linear-gradient(135deg,#ff6b00,#ff8f00);
+        padding: 22px;
+        color: white;
+    }
+
+    .pedido-number{
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .pedido-date{
+        opacity: .9;
+        font-size: .92rem;
+        margin-top: 5px;
+    }
+
+    .pedido-body{
+        padding: 24px;
+    }
+
+    .pedido-label{
+        color: gray;
+        font-size: .9rem;
+        margin-bottom: 3px;
+    }
+
+    .pedido-value{
+        font-weight: 700;
+        color: #111;
+        margin-bottom: 18px;
+    }
+
+    .pedido-total{
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #ff6b00;
+    }
+
+    .status-badge{
+        padding: 10px 16px;
+        border-radius: 50px;
+        font-size: .85rem;
+        font-weight: 700;
+        display: inline-block;
+    }
+
+    .status-recibido{
+        background: #ececec;
+        color: #555;
+    }
+
+    .status-preparacion{
+        background: #fff4db;
+        color: #b77900;
+    }
+
+    .status-listo{
+        background: #e8fff1;
+        color: #00a650;
+    }
+
+    .status-entregado{
+        background: #e7f1ff;
+        color: #0066ff;
+    }
+
+    .status-cancelado{
+        background: #ffe8e8;
+        color: #d00000;
+    }
+
+    .btn-detalles{
+        width: 100%;
+        border-radius: 14px;
+        padding: 12px;
+        font-weight: 700;
+        border: none;
+        background: #111;
+    }
+
+    .btn-detalles:hover{
+        background: #000;
+    }
+
+    .empty-state{
+        background: white;
+        padding: 70px 30px;
+        border-radius: 35px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    }
+
+    .empty-state i{
+        font-size: 4rem;
+        color: #ff6b00;
+        margin-bottom: 25px;
+    }
+
+    .empty-state h2{
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p{
+        color: gray;
+        margin-bottom: 30px;
+    }
+
+    .btn-explorar{
+        background: #ff6b00;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 15px;
+        font-weight: 700;
+    }
+
+    .pagination .page-link{
+        border: none;
+        color: #111;
+        margin: 0 4px;
+        border-radius: 12px;
+        padding: 10px 16px;
+    }
+
+    .pagination .active .page-link{
+        background: #ff6b00;
+        color: white;
+    }
+
+</style>
+
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Mis Pedidos</h1>
+
+<div class="container py-5">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <h1 class="page-title">
+            Mis Pedidos
+        </h1>
+
+        <p class="page-subtitle">
+            Consulta el estado y detalles de todos tus pedidos.
+        </p>
+
+    </div>
 
     {% if pedidos %}
-        <div class="row">
-            {% for pedido in pedidos %}
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Pedido #{{ pedido.id }}</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                <strong>Establecimiento:</strong> {{ pedido.establecimiento.nombre }}<br>
-                                <strong>Estado:</strong>
-                                <span class="badge
-                                    {% if pedido.estado == 'recibido' %}badge-secondary
-                                    {% elif pedido.estado == 'en_preparacion' %}badge-warning
-                                    {% elif pedido.estado == 'listo' %}badge-success
-                                    {% elif pedido.estado == 'entregado' %}badge-info
-                                    {% else %}badge-danger{% endif %}">
-                                    {{ pedido.get_estado_display }}
-                                </span><br>
-                                <strong>Tipo de entrega:</strong> {{ pedido.get_tipo_entrega_display }}<br>
-                                <strong>Total:</strong> ${{ pedido.precio_total }}<br>
-                                <strong>Fecha:</strong> {{ pedido.creado_en|date:"d/m/Y H:i" }}
-                            </p>
-                            <a href="{% url 'pedidos:detalle_pedido' pedido.pk %}" class="btn btn-primary">Ver Detalles</a>
-                        </div>
+
+    <div class="row g-4">
+
+        {% for pedido in pedidos %}
+
+        <div class="col-lg-6">
+
+            <div class="pedido-card">
+
+                <!-- HEADER -->
+                <div class="pedido-header">
+
+                    <h5 class="pedido-number">
+                        Pedido #{{ pedido.id }}
+                    </h5>
+
+                    <div class="pedido-date">
+                        {{ pedido.creado_en|date:"d/m/Y H:i" }}
                     </div>
+
                 </div>
+
+                <!-- BODY -->
+                <div class="pedido-body">
+
+                    <div class="row">
+
+                        <div class="col-6">
+
+                            <div class="pedido-label">
+                                Restaurante
+                            </div>
+
+                            <div class="pedido-value">
+                                {{ pedido.establecimiento.nombre }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-6">
+
+                            <div class="pedido-label">
+                                Entrega
+                            </div>
+
+                            <div class="pedido-value">
+                                {{ pedido.get_tipo_entrega_display }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="pedido-label">
+                        Estado del pedido
+                    </div>
+
+                    <div class="mb-4">
+
+                        <span class="status-badge
+                        
+                            {% if pedido.estado == 'recibido' %}
+                                status-recibido
+                            {% elif pedido.estado == 'en_preparacion' %}
+                                status-preparacion
+                            {% elif pedido.estado == 'listo' %}
+                                status-listo
+                            {% elif pedido.estado == 'entregado' %}
+                                status-entregado
+                            {% else %}
+                                status-cancelado
+                            {% endif %}
+                        
+                        ">
+                            {{ pedido.get_estado_display }}
+                        </span>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <div>
+
+                            <div class="pedido-label">
+                                Total
+                            </div>
+
+                            <div class="pedido-total">
+                                ${{ pedido.precio_total }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <a href="{% url 'pedidos:detalle_pedido' pedido.pk %}"
+                       class="btn btn-dark btn-detalles">
+
+                        <i class="fas fa-receipt me-2"></i>
+                        Ver detalles
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- PAGINATION -->
+    {% if is_paginated %}
+
+    <nav class="mt-5">
+
+        <ul class="pagination justify-content-center">
+
+            {% if page_obj.has_previous %}
+
+            <li class="page-item">
+                <a class="page-link"
+                   href="?page={{ page_obj.previous_page_number }}">
+                    Anterior
+                </a>
+            </li>
+
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+
+                {% if page_obj.number == num %}
+
+                <li class="page-item active">
+                    <a class="page-link"
+                       href="?page={{ num }}">
+                        {{ num }}
+                    </a>
+                </li>
+
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ num }}">
+                        {{ num }}
+                    </a>
+                </li>
+
+                {% endif %}
+
             {% endfor %}
-        </div>
 
-        {% if is_paginated %}
-            <nav aria-label="Navegación de pedidos">
-                <ul class="pagination justify-content-center">
-                    {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                        </li>
-                    {% endif %}
+            {% if page_obj.has_next %}
 
-                    {% for num in page_obj.paginator.page_range %}
-                        {% if page_obj.number == num %}
-                            <li class="page-item active">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
-                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="?page={{ page_obj.next_page_number }}">
+                    Siguiente
+                </a>
+            </li>
 
-                    {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        {% endif %}
-    {% else %}
-        <div class="alert alert-info">
-            <h4>No tienes pedidos aún</h4>
-            <p>¡Explora los establecimientos y realiza tu primer pedido!</p>
-            <a href="{% url 'establecimientos:lista_establecimientos' %}" class="btn btn-primary">Ver Establecimientos</a>
-        </div>
+            {% endif %}
+
+        </ul>
+
+    </nav>
+
     {% endif %}
+
+    {% else %}
+
+    <!-- EMPTY -->
+    <div class="empty-state">
+
+        <i class="fas fa-shopping-bag"></i>
+
+        <h2>
+            Aún no tienes pedidos
+        </h2>
+
+        <p>
+            Explora restaurantes y realiza tu primer pedido en Buho Go.
+        </p>
+
+        <a href="{% url 'establecimientos:lista_establecimientos' %}"
+           class="btn btn-explorar">
+
+            <i class="fas fa-store me-2"></i>
+            Explorar restaurantes
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
 </div>
+
 {% endblock %}

@@ -12,4 +12,9 @@ urlpatterns = [
     # URLs para personal del establecimiento
     path('gestionar/', views.GestionarPedidosView.as_view(), name='gestionar_pedidos'),
     path('<int:pk>/actualizar-estado/', views.ActualizarEstadoPedidoView.as_view(), name='actualizar_estado'),
+
+    # URLs para carrito
+    path('agregar-al-carrito/', views.agregar_al_carrito, name='agregar_al_carrito'),
+    path('eliminar-producto-carrito/<int:producto_id>/', views.eliminar_producto_carrito, name='eliminar_producto_carrito'),
+    path('limpiar-carrito/', views.limpiar_carrito, name='limpiar_carrito'),
 ]

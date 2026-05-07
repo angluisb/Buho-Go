@@ -333,9 +333,22 @@
                                     ${{ producto.precio }}
                                 </div>
 
-                                <button class="btn-add">
+                                <!-- Formulario para agregar al carrito -->
+                                {% if user.is_authenticated %}
+                                <form method="post" action="{% url 'pedidos:agregar_al_carrito' %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                                    <input type="hidden" name="establecimiento_id" value="{{ establecimiento.id }}">
+                                    <input type="hidden" name="cantidad" value="1">
+                                    <button type="submit" class="btn-add" title="Agregar al carrito">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <a href="{% url 'admin:login' %}" class="btn-add" title="Inicia sesión para agregar al carrito">
                                     <i class="fas fa-plus"></i>
-                                </button>
+                                </a>
+                                {% endif %}
 
                             </div>
 
@@ -415,32 +428,89 @@
 
                 </div>
 
-                <!-- ORDER -->
+                <!-- CARRITO -->
                 <div class="info-card">
 
                     <h4 class="fw-bold mb-3">
-                        Haz tu pedido
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Tu Carrito
                     </h4>
 
-                    <p class="text-muted">
-                        Ordena ahora y recoge tu pedido sin filas.
-                    </p>
+                    {% if user.is_authenticated %}
+                        {% if carrito_items %}
+                            <!-- Items en el carrito -->
+                            <div class="mb-3" style="max-height: 300px; overflow-y: auto;">
+                                {% for item in carrito_items %}
+                                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold small">{{ item.producto.nombre }}</div>
+                                        <div class="text-muted" style="font-size: 0.85rem;">
+                                            {{ item.cantidad }} x ${{ item.producto.precio }}
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold small">
+                                            ${{ item.subtotal }}
+                                        </div>
+                                        <form method="post" action="{% url 'pedidos:eliminar_producto_carrito' item.producto.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-link text-danger p-0" style="font-size: 0.75rem;">
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
 
-                    <a
-                        href="{% url 'pedidos:crear_pedido' establecimiento.pk %}"
-                        class="btn btn-dark w-100 action-btn"
-                    >
-                        <i class="fas fa-shopping-cart me-2"></i>
-                        Pedir Ahora
-                    </a>
+                            <!-- Total -->
+                            <div class="p-3 bg-light rounded mb-3" style="border-left: 4px solid #ff6b00;">
+                                <div class="d-flex justify-content-between fw-bold">
+                                    <span>Total:</span>
+                                    <span style="color: #ff6b00; font-size: 1.2rem;">
+                                        ${{ carrito_total }}
+                                    </span>
+                                </div>
+                            </div>
 
-                    <a
-                        href="{% url 'pedidos:mis_pedidos' %}"
-                        class="btn btn-outline-dark w-100 action-btn mt-3"
-                    >
-                        <i class="fas fa-receipt me-2"></i>
-                        Ver Mis Pedidos
-                    </a>
+                            <!-- Botones de acción -->
+                            <a href="{% url 'pedidos:crear_pedido' establecimiento.id %}" class="btn btn-dark w-100 action-btn mb-2">
+                                <i class="fas fa-check me-2"></i>
+                                Finalizar Pedido
+                            </a>
+
+                            <form method="post" action="{% url 'pedidos:limpiar_carrito' %}" style="display: inline; width: 100%;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger w-100 action-btn" style="font-size: 0.9rem; padding: 12px;">
+                                    <i class="fas fa-trash me-2"></i>
+                                    Vaciar Carrito
+                                </button>
+                            </form>
+                        {% else %}
+                            <p class="text-muted mb-4">
+                                Tu carrito está vacío. Agrega productos para comenzar.
+                            </p>
+
+                            <div class="alert alert-info border-0" style="font-size: 0.9rem;">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Selecciona productos y haz clic en el ícono <strong>+</strong> para agregar.
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted mb-3">
+                            Inicia sesión para usar el carrito y hacer pedidos.
+                        </p>
+
+                        <a href="{% url 'admin:login' %}" class="btn btn-primary w-100 action-btn">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Iniciar Sesión
+                        </a>
+
+                        <a href="{% url 'admin:login' %}" class="btn btn-outline-primary w-100 action-btn mt-3">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Crear Cuenta
+                        </a>
+                    {% endif %}
 
                 </div>
 
