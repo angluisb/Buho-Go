@@ -2,104 +2,148 @@
 
 {% block title %}Registro — Buho Go{% endblock %}
 
+{% block extra_head %}
+<style>
+  .auth-card {
+    border-radius: 28px;
+    border: none;
+    box-shadow: 0 15px 35px rgba(0,0,0,.08);
+  }
+  .auth-header {
+    background: linear-gradient(135deg, #ff6b00, #ff8f00);
+    border-radius: 28px 28px 0 0 !important;
+    padding: 1.2rem 1.5rem;
+    color: white;
+  }
+  .btn-auth {
+    background: linear-gradient(135deg, #ff6b00, #ff8f00);
+    border: none;
+    border-radius: 14px;
+    padding: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: white;
+  }
+  .btn-auth:hover { opacity: .9; color: white; }
+  .form-control, .form-select {
+    border-radius: 12px;
+    border: 1px solid #eee;
+    padding: 10px 14px;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #ff6b00;
+    box-shadow: 0 0 0 3px rgba(255,107,0,.15);
+  }
+  .link-auth { color: #ff6b00; font-weight: 600; }
+  .link-auth:hover { color: #ff8f00; }
+  .tipo-info {
+    background: #fff8f5;
+    border-left: 3px solid #ff6b00;
+    border-radius: 0 8px 8px 0;
+    padding: 8px 12px;
+    font-size: .85rem;
+    color: #555;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-7 col-lg-6">
+<div class="row justify-content-center mt-3">
+  <div class="col-md-6 col-lg-5">
 
-        <div class="text-center mb-4">
-            <div style="font-size:3rem;">🦉</div>
-            <h2 class="fw-bold" style="color:var(--buho-dark)">Crear cuenta</h2>
-            <p class="text-muted">Únete a Buho Go</p>
-        </div>
-
-        <div class="card">
-            <div class="card-header-buho">
-                <h5 class="mb-0"><i class="bi bi-person-plus me-2"></i>Registro</h5>
-            </div>
-            <div class="card-body p-4">
-                <form method="post">
-                    {% csrf_token %}
-
-                    {# Tipo de cuenta — se muestra primero porque cambia el contexto #}
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Tipo de cuenta</label>
-                        {{ form.tipo }}
-                        <div class="form-text">
-                            <i class="bi bi-info-circle"></i>
-                            Elige <strong>Estudiante</strong> si quieres hacer pedidos,
-                            o <strong>Comercio</strong> si tienes un negocio en el campus.
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Nombre</label>
-                            {{ form.first_name }}
-                            {% if form.first_name.errors %}
-                            <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Apellido</label>
-                            {{ form.last_name }}
-                            {% if form.last_name.errors %}
-                            <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Correo electrónico</label>
-                        {{ form.email }}
-                        {% if form.email.errors %}
-                        <div class="text-danger small">{{ form.email.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Nombre de usuario</label>
-                        {{ form.username }}
-                        {% if form.username.errors %}
-                        <div class="text-danger small">{{ form.username.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Contraseña</label>
-                            {{ form.password1 }}
-                            {% if form.password1.errors %}
-                            <div class="text-danger small">{{ form.password1.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Confirmar contraseña</label>
-                            {{ form.password2 }}
-                            {% if form.password2.errors %}
-                            <div class="text-danger small">{{ form.password2.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger py-2">{{ form.non_field_errors.0 }}</div>
-                    {% endif %}
-
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg"
-                            style="background:var(--buho-blue); border:none;">
-                            <i class="bi bi-person-check me-1"></i> Crear cuenta
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <p class="text-center mt-3 text-muted">
-            ¿Ya tienes cuenta?
-            <a href="{% url 'usuarios:login' %}" style="color:var(--buho-blue)">Inicia sesión</a>
-        </p>
-
+    <div class="text-center mb-3">
+      <div style="font-size:2.5rem;">🦉</div>
+      <h4 class="fw-bold">Crear cuenta</h4>
+      <p class="text-muted small">Únete a Buho Go</p>
     </div>
+
+    <div class="card auth-card">
+      <div class="auth-header">
+        <h6 class="mb-0 fw-bold">
+          <i class="fas fa-user-plus me-2"></i>Registro
+        </h6>
+      </div>
+      <div class="card-body p-3">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-2">
+            <label class="form-label fw-semibold small mb-1">Tipo de cuenta</label>
+            {{ form.tipo }}
+            <div class="tipo-info mt-2">
+              <strong>Estudiante</strong> para hacer pedidos ·
+              <strong>Comercio</strong> si tienes un negocio en el campus
+            </div>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label fw-semibold small mb-1">Nombre</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}
+                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold small mb-1">Apellido</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}
+                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-semibold small mb-1">Correo electrónico</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <div class="text-danger small">{{ form.email.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-semibold small mb-1">Nombre de usuario</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+              <div class="text-danger small">{{ form.username.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label fw-semibold small mb-1">Contraseña</label>
+              {{ form.password1 }}
+              {% if form.password1.errors %}
+                <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold small mb-1">Confirmar</label>
+              {{ form.password2 }}
+              {% if form.password2.errors %}
+                <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2 small rounded-3">{{ form.non_field_errors.0 }}</div>
+          {% endif %}
+
+          <div class="d-grid mt-3">
+            <button type="submit" class="btn btn-auth">
+              <i class="fas fa-user-check me-1"></i> Crear cuenta
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <p class="text-center mt-2 small text-muted">
+      ¿Ya tienes cuenta?
+      <a href="{% url 'usuarios:login' %}" class="link-auth">Inicia sesión</a>
+    </p>
+
+  </div>
 </div>
 {% endblock %}

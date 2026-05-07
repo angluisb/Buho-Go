@@ -2,113 +2,183 @@
 
 {% block title %}Mi Perfil — Buho Go{% endblock %}
 
+{% block extra_head %}
+<style>
+  .perfil-card {
+    border-radius: 28px;
+    border: none;
+    box-shadow: 0 15px 35px rgba(0,0,0,.08);
+  }
+  .perfil-header {
+    background: linear-gradient(135deg, #ff6b00, #ff8f00);
+    border-radius: 28px 28px 0 0 !important;
+    padding: 1.5rem;
+    color: white;
+  }
+  .avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+  .badge-tipo {
+    background: rgba(255,255,255,.25);
+    color: white;
+    border-radius: 50px;
+    padding: 4px 14px;
+    font-size: .8rem;
+    font-weight: 700;
+  }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: .95rem;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: #999; font-weight: 600; }
+  .estado-badge {
+    border-radius: 50px;
+    padding: 4px 12px;
+    font-size: .78rem;
+    font-weight: 700;
+  }
+  .btn-ver {
+    background: linear-gradient(135deg, #ff6b00, #ff8f00);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    padding: 8px 20px;
+  }
+  .btn-ver:hover { opacity: .9; color: white; }
+  .seccion-card {
+    border-radius: 24px;
+    border: none;
+    box-shadow: 0 8px 25px rgba(0,0,0,.06);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-7">
+<div class="row justify-content-center mt-3">
+  <div class="col-md-7 col-lg-6">
 
-        <h3 class="fw-bold mb-4" style="color:var(--buho-dark)">
-            <i class="bi bi-person-circle me-2"></i>Mi Perfil
-        </h3>
-
-        <div class="card mb-4">
-            <div class="card-header-buho d-flex align-items-center justify-content-between">
-                <h5 class="mb-0">Información de cuenta</h5>
-                {# Badge de rol con color según tipo #}
-                {% if user.tipo == 'estudiante' %}
-                <span class="badge bg-warning text-dark fs-6">🎓 Estudiante</span>
-                {% elif user.tipo == 'comercio' %}
-                <span class="badge bg-success fs-6">🏪 Comercio</span>
-                {% elif user.tipo == 'admin' %}
-                <span class="badge bg-danger fs-6">⚙️ Administrador</span>
-                {% endif %}
-            </div>
-            <div class="card-body p-4">
-                <div class="row mb-3">
-                    <div class="col-sm-4 text-muted fw-semibold">Nombre completo</div>
-                    <div class="col-sm-8">{{ user.get_full_name|default:"No especificado" }}</div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-4 text-muted fw-semibold">Usuario</div>
-                    <div class="col-sm-8">@{{ user.username }}</div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-4 text-muted fw-semibold">Correo</div>
-                    <div class="col-sm-8">{{ user.email|default:"No especificado" }}</div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-4 text-muted fw-semibold">Miembro desde</div>
-                    <div class="col-sm-8">{{ user.date_joined|date:"d/m/Y" }}</div>
-                </div>
-            </div>
+    <!-- Card principal -->
+    <div class="card perfil-card mb-4">
+      <div class="perfil-header">
+        <div class="d-flex align-items-center gap-3">
+          <div class="avatar">
+            {% if user.tipo == 'comercio' %}🏪
+            {% elif user.tipo == 'admin' %}⚙️
+            {% else %}🎓{% endif %}
+          </div>
+          <div>
+            <h5 class="mb-1 fw-bold">{{ user.get_full_name|default:user.username }}</h5>
+            <span class="badge-tipo">
+              {% if user.tipo == 'estudiante' %}Estudiante
+              {% elif user.tipo == 'comercio' %}Comercio
+              {% elif user.tipo == 'admin' %}Administrador
+              {% endif %}
+            </span>
+          </div>
         </div>
-
-        {# Sección específica según el tipo de usuario #}
-        {% if user.tipo == 'estudiante' %}
-        <div class="card">
-            <div class="card-body p-4">
-                <h6 class="fw-bold mb-3"><i class="bi bi-bag-check me-2 text-primary"></i>Mis pedidos recientes</h6>
-                {% with pedidos=user.pedidos.all|slice:":3" %}
-                {% if pedidos %}
-                {% for pedido in pedidos %}
-                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                    <div>
-                        <span class="fw-semibold">Pedido #{{ pedido.id }}</span>
-                        <span class="text-muted ms-2 small">{{ pedido.establecimiento.nombre }}</span>
-                    </div>
-                    <span class="badge
-                    {% if pedido.estado == 'recibido' %}bg-secondary
-                    {% elif pedido.estado == 'preparando' %}bg-warning text-dark
-                    {% elif pedido.estado == 'listo' %}bg-success
-                    {% elif pedido.estado == 'entregado' %}bg-primary
-                    {% else %}bg-danger{% endif %}">
-                        {{ pedido.get_estado_display }}
-                    </span>
-                </div>
-                {% endfor %}
-                <div class="text-center mt-3">
-                    <a href="{% url 'pedidos:mis_pedidos' %}" class="btn btn-outline-primary btn-sm">
-                        Ver todos mis pedidos
-                    </a>
-                </div>
-                {% else %}
-                <p class="text-muted text-center py-3">
-                    Aún no tienes pedidos. <a href="{% url 'establecimientos:lista_establecimientos' %}">¡Haz tu primer pedido!</a>
-                </p>
-                {% endif %}
-                {% endwith %}
-            </div>
+      </div>
+      <div class="card-body px-4 py-3">
+        <div class="info-row">
+          <span class="info-label">Usuario</span>
+          <span>@{{ user.username }}</span>
         </div>
-
-        {% elif user.tipo == 'comercio' %}
-        <div class="card">
-            <div class="card-body p-4">
-                <h6 class="fw-bold mb-3"><i class="bi bi-shop me-2 text-success"></i>Mis establecimientos</h6>
-                {% with establecimientos=user.establecimientos.all %}
-                {% if establecimientos %}
-                {% for est in establecimientos %}
-                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                    <div>
-                        <span class="fw-semibold">{{ est.nombre }}</span>
-                        <span class="text-muted ms-2 small">{{ est.ubicacion }}</span>
-                    </div>
-                    {% if est.activo %}
-                    <span class="badge bg-success">Activo</span>
-                    {% else %}
-                    <span class="badge bg-secondary">Inactivo</span>
-                    {% endif %}
-                </div>
-                {% endfor %}
-                {% else %}
-                <p class="text-muted text-center py-3">
-                    No tienes establecimientos registrados.
-                    <a href="/admin/establecimientos/establecimiento/add/">Agregar uno desde el admin</a>
-                </p>
-                {% endif %}
-                {% endwith %}
-            </div>
+        <div class="info-row">
+          <span class="info-label">Correo</span>
+          <span>{{ user.email|default:"—" }}</span>
         </div>
-        {% endif %}
-
+        <div class="info-row">
+          <span class="info-label">Miembro desde</span>
+          <span>{{ user.date_joined|date:"d/m/Y" }}</span>
+        </div>
+      </div>
     </div>
+
+    <!-- Sección según tipo -->
+    {% if user.tipo == 'estudiante' %}
+    <div class="card seccion-card">
+      <div class="card-body p-4">
+        <h6 class="fw-bold mb-3">
+          <i class="fas fa-bag-shopping me-2" style="color:#ff6b00"></i>Pedidos recientes
+        </h6>
+        {% with pedidos=user.pedidos.all|slice:":3" %}
+          {% if pedidos %}
+            {% for pedido in pedidos %}
+              <div class="info-row">
+                <div>
+                  <span class="fw-semibold">Pedido #{{ pedido.id }}</span>
+                  <span class="text-muted ms-2 small">{{ pedido.establecimiento.nombre }}</span>
+                </div>
+                <span class="estado-badge
+                  {% if pedido.estado == 'recibido' %}bg-secondary text-white
+                  {% elif pedido.estado == 'en_preparacion' %}bg-warning text-dark
+                  {% elif pedido.estado == 'listo' %}bg-success text-white
+                  {% elif pedido.estado == 'entregado' %}bg-primary text-white
+                  {% else %}bg-danger text-white{% endif %}">
+                  {{ pedido.get_estado_display }}
+                </span>
+              </div>
+            {% endfor %}
+            <div class="text-center mt-3">
+              <a href="{% url 'pedidos:mis_pedidos' %}" class="btn btn-ver">
+                Ver todos mis pedidos
+              </a>
+            </div>
+          {% else %}
+            <div class="text-center py-3 text-muted">
+              <div style="font-size:2.5rem;">🛒</div>
+              <p class="small mt-2">Aún no tienes pedidos.</p>
+              <a href="{% url 'establecimientos:lista_establecimientos' %}" class="btn btn-ver">
+                ¡Haz tu primer pedido!
+              </a>
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    {% elif user.tipo == 'comercio' %}
+    <div class="card seccion-card">
+      <div class="card-body p-4">
+        <h6 class="fw-bold mb-3">
+          <i class="fas fa-store me-2" style="color:#ff6b00"></i>Mis establecimientos
+        </h6>
+        {% with establecimientos=user.establecimientos.all %}
+          {% if establecimientos %}
+            {% for est in establecimientos %}
+              <div class="info-row">
+                <div>
+                  <span class="fw-semibold">{{ est.nombre }}</span>
+                  <span class="text-muted ms-2 small">{{ est.ubicacion }}</span>
+                </div>
+                {% if est.activo %}
+                  <span class="estado-badge bg-success text-white">Activo</span>
+                {% else %}
+                  <span class="estado-badge bg-secondary text-white">Inactivo</span>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted text-center small py-3">
+              No tienes establecimientos registrados.
+            </p>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
 </div>
 {% endblock %}
