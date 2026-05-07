@@ -27,7 +27,7 @@ def registro(request):
 
 def iniciar_sesion(request):
     if request.user.is_authenticated:
-        return redirect('establecimientos:catalogo')
+        return redirect('establecimientos:lista_establecimientos')
 
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -35,7 +35,7 @@ def iniciar_sesion(request):
             usuario = form.get_user()
             login(request, usuario)
             messages.success(request, f'¡Hola de nuevo, {usuario.first_name or usuario.username}!')
-            return redirect('establecimientos:catalogo')
+            return redirect('establecimientos:lista_establecimientos')
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
     else:
