@@ -16,7 +16,15 @@ class Pedido(models.Model):
         ('entrega', 'Entrega a domicilio'),
     ]
 
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='pedidos')
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name='pedidos',
+        null=True,
+        blank=True
+    )
+    cliente_nombre = models.CharField(max_length=150, blank=True)
+    cliente_email = models.EmailField(blank=True)
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='pedidos')
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='recibido')
     tipo_entrega = models.CharField(max_length=20, choices=TIPO_ENTREGA_CHOICES, default='recoger')
@@ -26,7 +34,8 @@ class Pedido(models.Model):
     actualizado_en = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Pedido #{self.id} - {self.usuario.email} - {self.establecimiento.nombre}"
+        cliente = self.cliente_nombre or (self.usuario.email if self.usuario else 'Cliente anónimo')
+        return f"Pedido #{self.id} - {cliente} - {self.establecimiento.nombre}"
 
     def calcular_total(self):
         total = sum(item.subtotal for item in self.items.all())

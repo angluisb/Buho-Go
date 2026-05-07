@@ -2,6 +2,21 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from .models import Establecimiento, Producto
 
+from django.shortcuts import render
+from establecimientos.models import Establecimiento
+
+
+def home(request):
+
+    establecimientos = Establecimiento.objects.all()[:6]
+
+    productos = Producto.objects.all()[:8]
+
+    return render(request, 'home.html', {
+        'establecimientos': establecimientos,
+        'productos': productos
+    })
+
 class ListaEstablecimientosView(ListView):
     model = Establecimiento
     template_name = 'establecimientos/lista_establecimientos.html'
