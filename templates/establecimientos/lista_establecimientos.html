@@ -1,81 +1,510 @@
 {% extends 'base.html' %}
 
-{% block title %}Establecimientos{% endblock %}
+{% block title %}
+Establecimientos
+{% endblock %}
+
+{% block extra_head %}
+
+<style>
+
+    body{
+        background: #f5f6fa;
+    }
+
+    .hero-section{
+        background: linear-gradient(135deg,#ff6b00,#ff8f00);
+        padding: 90px 0 70px;
+        border-radius: 0 0 40px 40px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before{
+        content: '';
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: rgba(255,255,255,.08);
+        border-radius: 50%;
+        top: -250px;
+        right: -200px;
+    }
+
+    .hero-title{
+        font-size: 3.2rem;
+        font-weight: 800;
+    }
+
+    .hero-subtitle{
+        font-size: 1.1rem;
+        opacity: .92;
+        max-width: 650px;
+    }
+
+    .search-container{
+        background: white;
+        padding: 15px;
+        border-radius: 24px;
+        margin-top: 35px;
+        box-shadow: 0 15px 35px rgba(0,0,0,.12);
+    }
+
+    .search-container .form-control{
+        border: none;
+        box-shadow: none;
+        padding: 15px;
+        font-size: 1rem;
+    }
+
+    .search-btn{
+        background: #111;
+        color: white;
+        border-radius: 16px;
+        padding: 15px 28px;
+        border: none;
+        font-weight: 700;
+    }
+
+    .filter-scroll{
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .filter-scroll::-webkit-scrollbar{
+        display: none;
+    }
+
+    .filter-chip{
+        background: white;
+        border-radius: 50px;
+        padding: 12px 22px;
+        white-space: nowrap;
+        font-weight: 600;
+        border: 1px solid #eee;
+        transition: .2s;
+        cursor: pointer;
+    }
+
+    .filter-chip:hover{
+        background: #ff6b00;
+        color: white;
+    }
+
+    .restaurant-card{
+        background: white;
+        border-radius: 28px;
+        overflow: hidden;
+        border: none;
+        transition: .25s;
+        height: 100%;
+    }
+
+    .restaurant-card:hover{
+        transform: translateY(-6px);
+        box-shadow: 0 18px 40px rgba(0,0,0,.08);
+    }
+
+    .restaurant-image{
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+    }
+
+    .restaurant-body{
+        padding: 22px;
+    }
+
+    .restaurant-title{
+        font-size: 1.25rem;
+        font-weight: 800;
+    }
+
+    .restaurant-description{
+        color: #777;
+        margin-top: 10px;
+        font-size: .95rem;
+        min-height: 60px;
+    }
+
+    .restaurant-meta{
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+    }
+
+    .meta-badge{
+        background: #f7f7f7;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+
+    .restaurant-footer{
+        padding: 0 22px 22px;
+    }
+
+    .btn-restaurant{
+        border-radius: 16px;
+        padding: 14px;
+        font-weight: 700;
+    }
+
+    .section-title{
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .pagination .page-link{
+        border: none;
+        margin: 0 5px;
+        border-radius: 12px;
+        color: #111;
+        font-weight: 600;
+    }
+
+    .pagination .active .page-link{
+        background: #ff6b00;
+    }
+
+    .empty-state{
+        background: white;
+        border-radius: 30px;
+        padding: 70px 40px;
+        text-align: center;
+    }
+
+    .empty-state i{
+        font-size: 4rem;
+        color: #ff6b00;
+        margin-bottom: 20px;
+    }
+
+    @media(max-width:991px){
+
+        .hero-title{
+            font-size: 2.4rem;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Establecimientos Disponibles</h1>
 
-    {% if establecimientos %}
-        <div class="row">
-            {% for establecimiento in establecimientos %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ establecimiento.nombre }}</h5>
-                            <p class="card-text">{{ establecimiento.descripcion|truncatechars:100 }}</p>
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    <i class="fas fa-map-marker-alt"></i> {{ establecimiento.direccion }}
-                                </small>
-                            </p>
-                            {% if establecimiento.telefono %}
-                                <p class="card-text">
-                                    <small class="text-muted">
-                                        <i class="fas fa-phone"></i> {{ establecimiento.telefono }}
-                                    </small>
-                                </p>
-                            {% endif %}
-                        </div>
-                        <div class="card-footer">
-                            <a href="{% url 'establecimientos:detalle_establecimiento' establecimiento.pk %}" class="btn btn-primary">
-                                <i class="fas fa-eye"></i> Ver Productos
-                            </a>
-                            {% if user.is_authenticated %}
-                                <a href="{% url 'pedidos:crear_pedido' establecimiento.pk %}" class="btn btn-success">
-                                    <i class="fas fa-shopping-cart"></i> Hacer Pedido
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
+<!-- HERO -->
+<section class="hero-section">
+
+    <div class="container">
+
+        <h1 class="hero-title">
+            Descubre restaurantes increíbles 🍔
+        </h1>
+
+        <p class="hero-subtitle mt-3">
+            Encuentra hamburguesas, sushi, pizza, snacks, bebidas y mucho más cerca de ti.
+        </p>
+
+        <!-- SEARCH -->
+        <div class="search-container">
+
+            <div class="row g-2 align-items-center">
+
+                <div class="col-lg-8">
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Buscar restaurantes, productos o categorías..."
+                    >
+
                 </div>
-            {% endfor %}
+
+                <div class="col-lg-4">
+
+                    <button class="search-btn w-100">
+                        <i class="fas fa-search me-2"></i>
+                        Buscar
+                    </button>
+
+                </div>
+
+            </div>
+
         </div>
 
+    </div>
+
+</section>
+
+<!-- FILTERS -->
+<section class="py-4">
+
+    <div class="container">
+
+        <div class="filter-scroll">
+
+            <div class="filter-chip">
+                🍔 Hamburguesas
+            </div>
+
+            <div class="filter-chip">
+                🍕 Pizza
+            </div>
+
+            <div class="filter-chip">
+                🍣 Sushi
+            </div>
+
+            <div class="filter-chip">
+                🥤 Bebidas
+            </div>
+
+            <div class="filter-chip">
+                🍰 Postres
+            </div>
+
+            <div class="filter-chip">
+                ☕ Café
+            </div>
+
+            <div class="filter-chip">
+                🌮 Tacos
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- RESTAURANTS -->
+<section class="pb-5">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h2 class="section-title mb-0">
+                Restaurantes disponibles
+            </h2>
+
+            <span class="text-muted">
+                {{ page_obj.paginator.count }} resultados
+            </span>
+
+        </div>
+
+        {% if establecimientos %}
+
+        <div class="row g-4">
+
+            {% for establecimiento in establecimientos %}
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="restaurant-card">
+
+                    <!-- IMAGE -->
+                    <img
+                        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200"
+                        class="restaurant-image"
+                    >
+
+                    <!-- BODY -->
+                    <div class="restaurant-body">
+
+                        <div class="restaurant-title">
+                            {{ establecimiento.nombre }}
+                        </div>
+
+                        <div class="restaurant-description">
+                            {{ establecimiento.descripcion|truncatechars:100 }}
+                        </div>
+
+                        <div class="restaurant-meta">
+
+                            <div class="meta-badge">
+                                ⭐ 4.8
+                            </div>
+
+                            <div class="meta-badge">
+                                ⏱ 20-35 min
+                            </div>
+
+                            <div class="meta-badge">
+                                🚚 Gratis
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4 text-muted small">
+
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            {{ establecimiento.direccion }}
+
+                        </div>
+
+                        {% if establecimiento.telefono %}
+
+                        <div class="mt-2 text-muted small">
+
+                            <i class="fas fa-phone me-2"></i>
+                            {{ establecimiento.telefono }}
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="restaurant-footer">
+
+                        <div class="row g-2">
+
+                            <div class="col-6">
+
+                                <a
+                                    href="{% url 'establecimientos:detalle_establecimiento' establecimiento.pk %}"
+                                    class="btn btn-dark w-100 btn-restaurant"
+                                >
+                                    Ver Menú
+                                </a>
+
+                            </div>
+
+                            {% if user.is_authenticated %}
+
+                            <div class="col-6">
+
+                                <a
+                                    href="{% url 'pedidos:crear_pedido' establecimiento.pk %}"
+                                    class="btn btn-warning w-100 btn-restaurant"
+                                >
+                                    Pedir
+                                </a>
+
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- PAGINATION -->
         {% if is_paginated %}
-            <nav aria-label="Navegación de establecimientos">
-                <ul class="pagination justify-content-center">
+
+        <div class="d-flex justify-content-center mt-5">
+
+            <nav>
+
+                <ul class="pagination">
+
                     {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                        </li>
+
+                    <li class="page-item">
+
+                        <a
+                            class="page-link"
+                            href="?page={{ page_obj.previous_page_number }}"
+                        >
+                            ←
+                        </a>
+
+                    </li>
+
                     {% endif %}
 
                     {% for num in page_obj.paginator.page_range %}
+
                         {% if page_obj.number == num %}
-                            <li class="page-item active">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
+
+                        <li class="page-item active">
+
+                            <a class="page-link" href="#">
+                                {{ num }}
+                            </a>
+
+                        </li>
+
                         {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
+
+                        <li class="page-item">
+
+                            <a
+                                class="page-link"
+                                href="?page={{ num }}"
+                            >
+                                {{ num }}
+                            </a>
+
+                        </li>
+
                         {% endif %}
+
                     {% endfor %}
 
                     {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
-                        </li>
+
+                    <li class="page-item">
+
+                        <a
+                            class="page-link"
+                            href="?page={{ page_obj.next_page_number }}"
+                        >
+                            →
+                        </a>
+
+                    </li>
+
                     {% endif %}
+
                 </ul>
+
             </nav>
-        {% endif %}
-    {% else %}
-        <div class="alert alert-info">
-            <h4>No hay establecimientos disponibles</h4>
-            <p>No hay establecimientos activos en este momento.</p>
+
         </div>
-    {% endif %}
-</div>
+
+        {% endif %}
+
+        {% else %}
+
+        <!-- EMPTY -->
+        <div class="empty-state">
+
+            <i class="fas fa-store"></i>
+
+            <h3 class="fw-bold">
+                No hay establecimientos disponibles
+            </h3>
+
+            <p class="text-muted mt-3">
+                Intenta nuevamente más tarde.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
 {% endblock %}

@@ -1,148 +1,565 @@
 {% extends 'base.html' %}
 
-{% block title %}Crear Pedido - {{ establecimiento.nombre }}{% endblock %}
+{% block title %}
+Crear Pedido - {{ establecimiento.nombre }}
+{% endblock %}
+
+{% block extra_head %}
+
+<style>
+
+    body{
+        background: #f5f7fb;
+    }
+
+    .pedido-hero{
+        background: linear-gradient(135deg,#ff6b00,#ff8f00);
+        padding: 70px 0;
+        color: white;
+        border-radius: 0 0 40px 40px;
+        margin-bottom: 40px;
+    }
+
+    .pedido-title{
+        font-size: 3rem;
+        font-weight: 800;
+    }
+
+    .pedido-subtitle{
+        opacity: .92;
+        font-size: 1.05rem;
+    }
+
+    .main-card{
+        background: white;
+        border-radius: 30px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,.05);
+        overflow: hidden;
+    }
+
+    .card-section{
+        padding: 30px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .section-title{
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 25px;
+    }
+
+    .product-item{
+        background: #fafafa;
+        border-radius: 24px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+        transition: .2s;
+    }
+
+    .product-item:hover{
+        border-color: #ff6b00;
+    }
+
+    .form-control,
+    .form-select{
+        border-radius: 16px;
+        padding: 14px;
+        border: 1px solid #ddd;
+        box-shadow: none !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus{
+        border-color: #ff6b00;
+    }
+
+    .btn-main{
+        background: #111;
+        color: white;
+        border-radius: 18px;
+        padding: 15px;
+        font-weight: 700;
+        border: none;
+    }
+
+    .btn-main:hover{
+        background: black;
+        color: white;
+    }
+
+    .btn-orange{
+        background: #ff6b00;
+        color: white;
+        border-radius: 18px;
+        padding: 14px 22px;
+        border: none;
+        font-weight: 700;
+    }
+
+    .btn-orange:hover{
+        background: #e55f00;
+        color: white;
+    }
+
+    .btn-delete{
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        border: none;
+    }
+
+    .summary-card{
+        background: white;
+        border-radius: 30px;
+        border: none;
+        padding: 25px;
+        position: sticky;
+        top: 100px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    }
+
+    .summary-title{
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
+
+    .summary-item{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        font-size: .95rem;
+    }
+
+    .total-box{
+        background: #111;
+        color: white;
+        border-radius: 20px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .total-price{
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .user-alert{
+        background: #eef6ff;
+        border: none;
+        border-radius: 20px;
+        padding: 18px;
+    }
+
+    @media(max-width:991px){
+
+        .pedido-title{
+            font-size: 2.2rem;
+        }
+
+        .summary-card{
+            margin-top: 30px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Crear Pedido en {{ establecimiento.nombre }}</h4>
-                </div>
-                <div class="card-body">
-                    <form method="post" id="pedidoForm">
-                        {% csrf_token %}
 
-                        <h5>Productos Disponibles</h5>
-                        <div id="productosContainer">
-                            <!-- Los productos se agregarán aquí dinámicamente -->
-                        </div>
+<!-- HERO -->
+<section class="pedido-hero">
 
-                        <button type="button" class="btn btn-secondary mb-3" onclick="agregarProducto()">
-                            <i class="fas fa-plus"></i> Agregar Producto
-                        </button>
+    <div class="container">
 
-                        <hr>
+        <h1 class="pedido-title">
+            Haz tu pedido 🍔
+        </h1>
 
-                        <h5>Detalles del Pedido</h5>
-                        <div class="form-group mb-3">
-                            <label for="{{ pedido_form.tipo_entrega.id_for_label }}">Tipo de Entrega:</label>
-                            {{ pedido_form.tipo_entrega }}
-                        </div>
+        <p class="pedido-subtitle mt-3">
+            Ordena tus productos favoritos de {{ establecimiento.nombre }}
+        </p>
 
-                        <div class="form-group mb-3">
-                            <label for="{{ pedido_form.notas.id_for_label }}">Notas (opcional):</label>
-                            {{ pedido_form.notas }}
-                        </div>
-
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-shopping-cart"></i> Realizar Pedido
-                            </button>
-                            <a href="{% url 'establecimientos:detalle_establecimiento' establecimiento.id %}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancelar
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Resumen del Pedido</h5>
-                </div>
-                <div class="card-body">
-                    <div id="resumenPedido">
-                        <p class="text-muted">No hay productos seleccionados</p>
-                    </div>
-                    <hr>
-                    <h6>Total: $<span id="totalPedido">0.00</span></h6>
-                </div>
-            </div>
-        </div>
     </div>
+
+</section>
+
+<div class="container pb-5">
+
+    <div class="row g-4">
+
+        <!-- FORM -->
+        <div class="col-lg-8">
+
+            <div class="main-card">
+
+                <form method="post" id="pedidoForm">
+
+                    {% csrf_token %}
+
+                    <!-- PRODUCTS -->
+                    <div class="card-section">
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+
+                            <h3 class="section-title mb-0">
+                                Productos
+                            </h3>
+
+                            <button
+                                type="button"
+                                class="btn btn-orange"
+                                onclick="agregarProducto()"
+                            >
+                                <i class="fas fa-plus me-2"></i>
+                                Agregar
+                            </button>
+
+                        </div>
+
+                        <div id="productosContainer"></div>
+
+                    </div>
+
+                    <!-- USER INFO -->
+                    <div class="card-section">
+
+                        <h3 class="section-title">
+                            Datos del Cliente
+                        </h3>
+
+                        {% if not user.is_authenticated %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Nombre completo
+                            </label>
+
+                            {{ pedido_form.cliente_nombre }}
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Correo electrónico
+                            </label>
+
+                            {{ pedido_form.cliente_email }}
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="user-alert">
+
+                            <i class="fas fa-user-circle me-2"></i>
+
+                            Pedido realizado por:
+
+                            <strong>
+                                {{ user.first_name }} {{ user.last_name }}
+                            </strong>
+
+                            ({{ user.email }})
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <!-- DELIVERY -->
+                    <div class="card-section">
+
+                        <h3 class="section-title">
+                            Entrega y Notas
+                        </h3>
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Tipo de entrega
+                            </label>
+
+                            {{ pedido_form.tipo_entrega }}
+
+                        </div>
+
+                        <div>
+
+                            <label class="form-label fw-semibold">
+                                Notas adicionales
+                            </label>
+
+                            {{ pedido_form.notas }}
+
+                        </div>
+
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="card-section border-0">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-main w-100"
+                                >
+                                    <i class="fas fa-shopping-bag me-2"></i>
+                                    Confirmar Pedido
+                                </button>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <a
+                                    href="{% url 'establecimientos:detalle_establecimiento' establecimiento.id %}"
+                                    class="btn btn-outline-dark w-100 btn-main bg-white text-dark"
+                                >
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Volver
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="col-lg-4">
+
+            <div class="summary-card">
+
+                <h3 class="summary-title mb-4">
+                    Resumen
+                </h3>
+
+                <div id="resumenPedido">
+
+                    <p class="text-muted">
+                        No hay productos seleccionados
+                    </p>
+
+                </div>
+
+                <div class="total-box">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div>Total</div>
+
+                            <div class="small opacity-75">
+                                Incluye impuestos
+                            </div>
+                        </div>
+
+                        <div class="total-price">
+                            $<span id="totalPedido">0.00</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script>
+
 let productoIndex = 0;
-const productos = {{ productos|json_script:"productosData" }};
 
 function agregarProducto() {
+
     const container = document.getElementById('productosContainer');
+
     const div = document.createElement('div');
-    div.className = 'producto-item border rounded p-3 mb-3';
+
+    div.className = 'product-item';
+
     div.innerHTML = `
-        <div class="row">
+
+        <div class="row align-items-end g-3">
+
             <div class="col-md-6">
-                <label>Producto:</label>
-                <select name="producto_${productoIndex}" class="form-control" onchange="actualizarResumen()">
-                    <option value="">Seleccionar producto...</option>
+
+                <label class="form-label fw-semibold">
+                    Producto
+                </label>
+
+                <select
+                    name="producto_${productoIndex}"
+                    class="form-select"
+                    onchange="actualizarResumen()"
+                >
+
+                    <option value="">
+                        Selecciona un producto
+                    </option>
+
                     {% for producto in productos %}
-                        <option value="{{ producto.id }}" data-precio="{{ producto.precio }}" data-nombre="{{ producto.nombre }}">
-                            {{ producto.nombre }} - ${{ producto.precio }}
-                        </option>
+
+                    <option
+                        value="{{ producto.id }}"
+                        data-precio="{{ producto.precio }}"
+                        data-nombre="{{ producto.nombre }}"
+                    >
+                        {{ producto.nombre }} - ${{ producto.precio }}
+                    </option>
+
                     {% endfor %}
+
                 </select>
+
             </div>
+
             <div class="col-md-4">
-                <label>Cantidad:</label>
-                <input type="number" name="cantidad_${productoIndex}" class="form-control" min="1" value="1" onchange="actualizarResumen()">
+
+                <label class="form-label fw-semibold">
+                    Cantidad
+                </label>
+
+                <input
+                    type="number"
+                    min="1"
+                    value="1"
+                    name="cantidad_${productoIndex}"
+                    class="form-control"
+                    onchange="actualizarResumen()"
+                >
+
             </div>
+
             <div class="col-md-2">
-                <label>&nbsp;</label>
-                <button type="button" class="btn btn-danger btn-block" onclick="eliminarProducto(this)">
+
+                <button
+                    type="button"
+                    class="btn btn-danger btn-delete w-100"
+                    onclick="eliminarProducto(this)"
+                >
                     <i class="fas fa-trash"></i>
                 </button>
+
             </div>
+
         </div>
+
     `;
+
     container.appendChild(div);
+
     productoIndex++;
+
     actualizarResumen();
+
 }
 
-function eliminarProducto(button) {
-    button.closest('.producto-item').remove();
+function eliminarProducto(button){
+
+    button.closest('.product-item').remove();
+
     actualizarResumen();
+
 }
 
-function actualizarResumen() {
+function actualizarResumen(){
+
     const resumen = document.getElementById('resumenPedido');
+
     const totalSpan = document.getElementById('totalPedido');
+
     let total = 0;
+
     let html = '';
 
-    const productosSeleccionados = document.querySelectorAll('.producto-item');
-    productosSeleccionados.forEach(item => {
-        const select = item.querySelector('select');
-        const input = item.querySelector('input[type="number"]');
+    const productosSeleccionados = document.querySelectorAll('.product-item');
 
-        if (select.value && input.value > 0) {
+    productosSeleccionados.forEach(item => {
+
+        const select = item.querySelector('select');
+
+        const cantidadInput = item.querySelector('input');
+
+        if(select.value){
+
             const option = select.selectedOptions[0];
+
             const nombre = option.getAttribute('data-nombre');
+
             const precio = parseFloat(option.getAttribute('data-precio'));
-            const cantidad = parseInt(input.value);
+
+            const cantidad = parseInt(cantidadInput.value);
+
             const subtotal = precio * cantidad;
 
-            html += `<p>${nombre}: ${cantidad} x $${precio} = $${subtotal.toFixed(2)}</p>`;
             total += subtotal;
+
+            html += `
+
+                <div class="summary-item">
+
+                    <div>
+                        <strong>${nombre}</strong>
+                        <div class="text-muted small">
+                            ${cantidad} x $${precio.toFixed(2)}
+                        </div>
+                    </div>
+
+                    <div>
+                        $${subtotal.toFixed(2)}
+                    </div>
+
+                </div>
+
+            `;
+
         }
+
     });
 
-    if (html === '') {
-        html = '<p class="text-muted">No hay productos seleccionados</p>';
+    if(html === ''){
+
+        html = `
+            <p class="text-muted">
+                No hay productos seleccionados
+            </p>
+        `;
+
     }
 
     resumen.innerHTML = html;
+
     totalSpan.textContent = total.toFixed(2);
+
 }
 
-// Agregar un producto por defecto
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function(){
+
     agregarProducto();
+
 });
+
 </script>
+
 {% endblock %}

@@ -3,104 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}Buho Go{% endblock %}</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        *{
+            font-family: 'Inter', sans-serif;
+        }
+
+        body{
+            background: #f5f5f7;
+        }
+
+        .navbar{
+            background: white !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,.05);
+        }
+
+        .navbar-brand{
+            font-weight: 700;
+        }
+
+        .search-box{
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .search-box input{
+            width: 100%;
+            border: none;
+            background: #f1f1f1;
+            border-radius: 50px;
+            padding: 12px 20px 12px 45px;
+        }
+
+        .search-box i{
+            position: absolute;
+            left: 18px;
+            top: 14px;
+            color: gray;
+        }
+
+        .btn-main{
+            background: #ff6b00;
+            border: none;
+            color: white;
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-weight: 600;
+        }
+
+        .btn-main:hover{
+            background: #e65f00;
+            color: white;
+        }
+
+    </style>
 
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-owl"></i> Buho Go
-            </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg sticky-top py-3">
+    <div class="container">
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'establecimientos:lista_establecimientos' %}">
-                            <i class="fas fa-store"></i> Establecimientos
-                        </a>
-                    </li>
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'pedidos:mis_pedidos' %}">
-                                <i class="fas fa-shopping-cart"></i> Mis Pedidos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'pedidos:gestionar_pedidos' %}">
-                                <i class="fas fa-cog"></i> Gestionar Pedidos
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-owl text-warning"></i>
+            Buho Go
+        </a>
 
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user"></i> {{ user.email }}
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">
-                                    <i class="fas fa-user-edit"></i> Perfil
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">
-                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                                </a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-user-plus"></i> Registrarse
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
+        <!-- SEARCH -->
+        <div class="search-box mx-4 d-none d-lg-block">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar productos o restaurantes...">
         </div>
-    </nav>
 
-    <main>
-        {% if messages %}
-            <div class="container mt-3">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        {% block content %}{% endblock %}
-    </main>
+        <div class="collapse navbar-collapse" id="navbarNav">
 
-    <footer class="bg-light mt-5 py-4">
-        <div class="container text-center">
-            <p class="mb-0">&copy; 2024 Buho Go. Todos los derechos reservados.</p>
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'establecimientos:lista_establecimientos' %}">
+                        <i class="fas fa-store"></i> Restaurantes
+                    </a>
+                </li>
+
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'pedidos:mis_pedidos' %}">
+                        <i class="fas fa-shopping-cart"></i> Mis Pedidos
+                    </a>
+                </li>
+
+       
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i> {{ user.first_name|default:user.username }}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'usuarios:perfil' %}">
+                            <i class="fas fa-user-edit"></i> Perfil
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'usuarios:logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'pedidos:mis_pedidos' %}">
+                        <i class="fas fa-shopping-cart"></i> Pedidos
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:login' %}">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:registro' %}">
+                        <i class="fas fa-user-plus"></i> Registrarse
+                    </a>
+                </li>
+                {% endif %}
+
+            </ul>
+
         </div>
-    </footer>
+    </div>
+</nav>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- CONTENT -->
+<main>
 
-    {% block extra_scripts %}{% endblock %}
+    {% if messages %}
+        <div class="container mt-3">
+
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+        </div>
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-white py-4 mt-5 border-top">
+    <div class="container text-center">
+        © 2025 Buho Go
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block extra_scripts %}{% endblock %}
+
 </body>
 </html>

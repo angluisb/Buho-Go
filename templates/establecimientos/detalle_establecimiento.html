@@ -1,86 +1,455 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ establecimiento.nombre }}{% endblock %}
+{% block title %}
+{{ establecimiento.nombre }}
+{% endblock %}
+
+{% block extra_head %}
+
+<style>
+
+    body{
+        background: #f6f7fb;
+    }
+
+    .restaurant-hero{
+        position: relative;
+        height: 380px;
+        border-radius: 0 0 35px 35px;
+        overflow: hidden;
+    }
+
+    .restaurant-hero img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-overlay{
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to top,
+            rgba(0,0,0,.75),
+            rgba(0,0,0,.2)
+        );
+    }
+
+    .hero-content{
+        position: absolute;
+        bottom: 35px;
+        left: 40px;
+        color: white;
+    }
+
+    .hero-title{
+        font-size: 3rem;
+        font-weight: 800;
+    }
+
+    .hero-meta{
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+
+    .hero-badge{
+        background: rgba(255,255,255,.18);
+        backdrop-filter: blur(10px);
+        padding: 10px 18px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: .95rem;
+    }
+
+    .section-title{
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .product-card{
+        border: none;
+        border-radius: 28px;
+        overflow: hidden;
+        background: white;
+        transition: .25s;
+        height: 100%;
+    }
+
+    .product-card:hover{
+        transform: translateY(-6px);
+        box-shadow: 0 15px 35px rgba(0,0,0,.08);
+    }
+
+    .product-image{
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+    }
+
+    .product-body{
+        padding: 20px;
+    }
+
+    .product-title{
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .product-description{
+        color: #777;
+        font-size: .95rem;
+        margin-top: 8px;
+        min-height: 48px;
+    }
+
+    .product-price{
+        color: #ff6b00;
+        font-size: 1.3rem;
+        font-weight: 800;
+    }
+
+    .btn-add{
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        background: #ff6b00;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .info-card{
+        background: white;
+        border-radius: 28px;
+        padding: 25px;
+        border: none;
+    }
+
+    .sticky-card{
+        position: sticky;
+        top: 100px;
+    }
+
+    .action-btn{
+        border-radius: 18px;
+        padding: 16px;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .search-box{
+        background: white;
+        border-radius: 20px;
+        padding: 15px 20px;
+        border: none;
+        box-shadow: 0 5px 20px rgba(0,0,0,.04);
+    }
+
+    .search-box input{
+        border: none;
+        box-shadow: none;
+    }
+
+    .category-scroll{
+        display: flex;
+        gap: 15px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .category-scroll::-webkit-scrollbar{
+        display: none;
+    }
+
+    .category-chip{
+        background: white;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-weight: 600;
+        white-space: nowrap;
+        border: 1px solid #eee;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .category-chip:hover{
+        background: #ff6b00;
+        color: white;
+    }
+
+    @media(max-width:991px){
+
+        .restaurant-hero{
+            height: 300px;
+        }
+
+        .hero-content{
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+        }
+
+        .hero-title{
+            font-size: 2rem;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4>{{ establecimiento.nombre }}</h4>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">{{ establecimiento.descripcion }}</p>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Dirección:</strong><br>{{ establecimiento.direccion }}</p>
-                            {% if establecimiento.telefono %}
-                                <p><strong>Teléfono:</strong><br>{{ establecimiento.telefono }}</p>
-                            {% endif %}
-                            {% if establecimiento.email %}
-                                <p><strong>Email:</strong><br>{{ establecimiento.email }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
+
+<!-- HERO -->
+<section class="restaurant-hero">
+
+    <img
+        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1600"
+        alt="{{ establecimiento.nombre }}"
+    >
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+
+        <h1 class="hero-title">
+            {{ establecimiento.nombre }}
+        </h1>
+
+        <div class="hero-meta">
+
+            <div class="hero-badge">
+                ⭐ 4.8
             </div>
 
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h4>Productos Disponibles</h4>
-                </div>
-                <div class="card-body">
-                    {% if productos %}
-                        <div class="row">
-                            {% for producto in productos %}
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="card-body">
-                                            <h6 class="card-title">{{ producto.nombre }}</h6>
-                                            <p class="card-text">{{ producto.descripcion|truncatechars:80 }}</p>
-                                            <h5 class="text-success">${{ producto.precio }}</h5>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-muted">No hay productos disponibles en este establecimiento.</p>
-                    {% endif %}
-                </div>
+            <div class="hero-badge">
+                ⏱ 20-35 min
             </div>
+
+            <div class="hero-badge">
+                🚚 Envío Gratis
+            </div>
+
         </div>
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Acciones</h4>
-                </div>
-                <div class="card-body">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'pedidos:crear_pedido' establecimiento.pk %}" class="btn btn-success btn-lg btn-block">
-                            <i class="fas fa-shopping-cart"></i> Hacer Pedido Anticipado
-                        </a>
-                        <p class="text-muted mt-2">
-                            <small>Tu pedido estará listo cuando llegues al establecimiento.</small>
-                        </p>
-                    {% else %}
-                        <p>Para hacer un pedido, necesitas <a href="#">iniciar sesión</a> o <a href="#">registrarte</a>.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% if user.is_authenticated %}
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <a href="{% url 'pedidos:mis_pedidos' %}" class="btn btn-outline-primary btn-block">
-                            <i class="fas fa-list"></i> Ver Mis Pedidos
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
     </div>
+
+</section>
+
+<div class="container py-5">
+
+    <div class="row">
+
+        <!-- PRODUCTS -->
+        <div class="col-lg-8">
+
+            <!-- SEARCH -->
+            <div class="search-box mb-4">
+
+                <div class="input-group">
+
+                    <span class="input-group-text bg-white border-0">
+                        <i class="fas fa-search"></i>
+                    </span>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Buscar productos..."
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- CATEGORIES -->
+            <div class="category-scroll mb-5">
+
+                <div class="category-chip">
+                    🍔 Hamburguesas
+                </div>
+
+                <div class="category-chip">
+                    🍟 Snacks
+                </div>
+
+                <div class="category-chip">
+                    🥤 Bebidas
+                </div>
+
+                <div class="category-chip">
+                    🍕 Pizza
+                </div>
+
+                <div class="category-chip">
+                    🍰 Postres
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h2 class="section-title mb-0">
+                    Productos
+                </h2>
+
+                <span class="text-muted">
+                    {{ productos|length }} disponibles
+                </span>
+
+            </div>
+
+            {% if productos %}
+
+            <div class="row g-4">
+
+                {% for producto in productos %}
+
+                <div class="col-md-6">
+
+                    <div class="product-card">
+
+                        <img
+                            src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1200"
+                            class="product-image"
+                        >
+
+                        <div class="product-body">
+
+                            <div class="product-title">
+                                {{ producto.nombre }}
+                            </div>
+
+                            <div class="product-description">
+                                {{ producto.descripcion|truncatechars:90 }}
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+
+                                <div class="product-price">
+                                    ${{ producto.precio }}
+                                </div>
+
+                                <button class="btn-add">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <div class="alert alert-light border-0 rounded-4 p-4">
+                No hay productos disponibles.
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="col-lg-4 mt-5 mt-lg-0">
+
+            <div class="sticky-card">
+
+                <!-- INFO -->
+                <div class="info-card mb-4">
+
+                    <h4 class="fw-bold mb-4">
+                        Información
+                    </h4>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">
+                            Dirección
+                        </div>
+
+                        <div class="fw-semibold">
+                            {{ establecimiento.direccion }}
+                        </div>
+                    </div>
+
+                    {% if establecimiento.telefono %}
+
+                    <div class="mb-3">
+
+                        <div class="text-muted small">
+                            Teléfono
+                        </div>
+
+                        <div class="fw-semibold">
+                            {{ establecimiento.telefono }}
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                    {% if establecimiento.email %}
+
+                    <div>
+
+                        <div class="text-muted small">
+                            Email
+                        </div>
+
+                        <div class="fw-semibold">
+                            {{ establecimiento.email }}
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- ORDER -->
+                <div class="info-card">
+
+                    <h4 class="fw-bold mb-3">
+                        Haz tu pedido
+                    </h4>
+
+                    <p class="text-muted">
+                        Ordena ahora y recoge tu pedido sin filas.
+                    </p>
+
+                    <a
+                        href="{% url 'pedidos:crear_pedido' establecimiento.pk %}"
+                        class="btn btn-dark w-100 action-btn"
+                    >
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Pedir Ahora
+                    </a>
+
+                    <a
+                        href="{% url 'pedidos:mis_pedidos' %}"
+                        class="btn btn-outline-dark w-100 action-btn mt-3"
+                    >
+                        <i class="fas fa-receipt me-2"></i>
+                        Ver Mis Pedidos
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
 {% endblock %}

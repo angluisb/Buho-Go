@@ -1,0 +1,18 @@
+[33ma53d1e6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'main' of https://github.com/angluisb/Buho-Go
+[33m4339f29[m Merge branch 'main' of https://github.com/angluisb/Buho-Go
+[33m4b98b9d[m cambios en el ux
+[33mdb914f2[m vistas de casi todo, haciendolo bellaco
+[33m52c6396[m feat: actualizar forms y views de usuarios
+[33m53e7f71[m fix:arregle algo
+[33med72e65[m ya tu sabe bro
+[33m5f4c680[m feat: usuarios type shit
+[33m0eb40f0[m Se crearon establecikiento base html modelos de establecimientos, 3 vistas de establecimientos para los detalles listas y el base
+[33m634fd65[m refactor: Actualizacion del modelo usuario
+[33m116c9ca[m Merge branch 'main' of https://github.com/angluisb/Buho-Go
+[33m62ee73c[m feat: Configuracion de tabla Users
+[33m7cf2ed2[m Update repository URL in installation instructions
+[33m829081d[m feat: Agregar .env.example para facilitar la integracion al proyecto
+[33m51db6c8[m Add Windows instructions for copying .env file
+[33m1da7397[m Feat: Inital commit
+[33mc46c3ed[m Revise README with project details and setup instructions
+[33m2f065ea[m Initial commit
