@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Establecimientos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Mis establecimientos</h1>
+            <p class="text-muted">Aquí puedes ver los restaurantes que administras.</p>
+        </div>
+        <div>
+            <a href="{% url 'establecimientos:crear_establecimiento' %}" class="btn btn-success me-2">
+                <i class="fas fa-plus me-2"></i> Crear Restaurante
+            </a>
+            <a href="{% url 'pedidos:gestionar_pedidos' %}" class="btn btn-primary">
+                <i class="fas fa-tasks me-2"></i> Gestionar Pedidos
+            </a>
+        </div>
+    </div>
+
+    {% if establecimientos %}
+        <div class="row gy-4">
+            {% for establecimiento in establecimientos %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        {% if establecimiento.imagen %}
+                            <img src="{{ establecimiento.imagen.url }}" class="card-img-top" alt="{{ establecimiento.nombre }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ establecimiento.nombre }}</h5>
+                            <p class="card-text text-muted">{{ establecimiento.direccion }}</p>
+                            <p class="card-text">{{ establecimiento.descripcion|truncatechars:120 }}</p>
+                        </div>
+                        <div class="card-footer bg-white border-top-0">
+                            <a href="{% url 'establecimientos:detalle_establecimiento' establecimiento.pk %}" class="btn btn-outline-primary w-100">
+                                Ver Restaurante
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Aún no tienes establecimientos registrados.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

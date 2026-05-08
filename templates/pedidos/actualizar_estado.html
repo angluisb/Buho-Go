@@ -12,7 +12,7 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <strong>Cliente:</strong> {{ pedido.usuario.email }}<br>
+                        <strong>Cliente:</strong> {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}<br>
                         <strong>Establecimiento:</strong> {{ pedido.establecimiento.nombre }}<br>
                         <strong>Estado actual:</strong>
                         <span class="badge

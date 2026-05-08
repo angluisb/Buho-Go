@@ -12,6 +12,8 @@ urlpatterns = [
     # URLs para personal del establecimiento
     path('gestionar/', views.GestionarPedidosView.as_view(), name='gestionar_pedidos'),
     path('<int:pk>/actualizar-estado/', views.ActualizarEstadoPedidoView.as_view(), name='actualizar_estado'),
+    path('<int:pk>/aceptar/', views.aceptar_pedido, name='aceptar_pedido'),
+    path('<int:pk>/marcar-listo/', views.marcar_listo_pedido, name='marcar_listo_pedido'),
 
     # URLs para carrito
     path('agregar-al-carrito/', views.agregar_al_carrito, name='agregar_al_carrito'),

@@ -7,32 +7,36 @@
   .perfil-card {
     border-radius: 28px;
     border: none;
-    box-shadow: 0 15px 35px rgba(0,0,0,.08);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, .08);
   }
+
   .perfil-header {
     background: linear-gradient(135deg, #ff6b00, #ff8f00);
     border-radius: 28px 28px 0 0 !important;
     padding: 1.5rem;
     color: white;
   }
+
   .avatar {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background: rgba(255,255,255,.25);
+    background: rgba(255, 255, 255, .25);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
   }
+
   .badge-tipo {
-    background: rgba(255,255,255,.25);
+    background: rgba(255, 255, 255, .25);
     color: white;
     border-radius: 50px;
     padding: 4px 14px;
     font-size: .8rem;
     font-weight: 700;
   }
+
   .info-row {
     display: flex;
     justify-content: space-between;
@@ -40,14 +44,23 @@
     border-bottom: 1px solid #f5f5f5;
     font-size: .95rem;
   }
-  .info-row:last-child { border-bottom: none; }
-  .info-label { color: #999; font-weight: 600; }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    color: #999;
+    font-weight: 600;
+  }
+
   .estado-badge {
     border-radius: 50px;
     padding: 4px 12px;
     font-size: .78rem;
     font-weight: 700;
   }
+
   .btn-ver {
     background: linear-gradient(135deg, #ff6b00, #ff8f00);
     border: none;
@@ -56,11 +69,16 @@
     font-weight: 600;
     padding: 8px 20px;
   }
-  .btn-ver:hover { opacity: .9; color: white; }
+
+  .btn-ver:hover {
+    opacity: .9;
+    color: white;
+  }
+
   .seccion-card {
     border-radius: 24px;
     border: none;
-    box-shadow: 0 8px 25px rgba(0,0,0,.06);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .06);
   }
 </style>
 {% endblock %}
@@ -113,37 +131,37 @@
           <i class="fas fa-bag-shopping me-2" style="color:#ff6b00"></i>Pedidos recientes
         </h6>
         {% with pedidos=user.pedidos.all|slice:":3" %}
-          {% if pedidos %}
-            {% for pedido in pedidos %}
-              <div class="info-row">
-                <div>
-                  <span class="fw-semibold">Pedido #{{ pedido.id }}</span>
-                  <span class="text-muted ms-2 small">{{ pedido.establecimiento.nombre }}</span>
-                </div>
-                <span class="estado-badge
+        {% if pedidos %}
+        {% for pedido in pedidos %}
+        <div class="info-row">
+          <div>
+            <span class="fw-semibold">Pedido #{{ pedido.id }}</span>
+            <span class="text-muted ms-2 small">{{ pedido.establecimiento.nombre }}</span>
+          </div>
+          <span class="estado-badge
                   {% if pedido.estado == 'recibido' %}bg-secondary text-white
                   {% elif pedido.estado == 'en_preparacion' %}bg-warning text-dark
                   {% elif pedido.estado == 'listo' %}bg-success text-white
                   {% elif pedido.estado == 'entregado' %}bg-primary text-white
                   {% else %}bg-danger text-white{% endif %}">
-                  {{ pedido.get_estado_display }}
-                </span>
-              </div>
-            {% endfor %}
-            <div class="text-center mt-3">
-              <a href="{% url 'pedidos:mis_pedidos' %}" class="btn btn-ver">
-                Ver todos mis pedidos
-              </a>
-            </div>
-          {% else %}
-            <div class="text-center py-3 text-muted">
-              <div style="font-size:2.5rem;">🛒</div>
-              <p class="small mt-2">Aún no tienes pedidos.</p>
-              <a href="{% url 'establecimientos:lista_establecimientos' %}" class="btn btn-ver">
-                ¡Haz tu primer pedido!
-              </a>
-            </div>
-          {% endif %}
+            {{ pedido.get_estado_display }}
+          </span>
+        </div>
+        {% endfor %}
+        <div class="text-center mt-3">
+          <a href="{% url 'pedidos:mis_pedidos' %}" class="btn btn-ver">
+            Ver todos mis pedidos
+          </a>
+        </div>
+        {% else %}
+        <div class="text-center py-3 text-muted">
+          <div style="font-size:2.5rem;">🛒</div>
+          <p class="small mt-2">Aún no tienes pedidos.</p>
+          <a href="{% url 'establecimientos:lista_establecimientos' %}" class="btn btn-ver">
+            ¡Haz tu primer pedido!
+          </a>
+        </div>
+        {% endif %}
         {% endwith %}
       </div>
     </div>
@@ -155,30 +173,51 @@
           <i class="fas fa-store me-2" style="color:#ff6b00"></i>Mis establecimientos
         </h6>
         {% with establecimientos=user.establecimientos.all %}
-          {% if establecimientos %}
-            {% for est in establecimientos %}
-              <div class="info-row">
-                <div>
-                  <span class="fw-semibold">{{ est.nombre }}</span>
-                  <span class="text-muted ms-2 small">{{ est.ubicacion }}</span>
-                </div>
-                {% if est.activo %}
-                  <span class="estado-badge bg-success text-white">Activo</span>
-                {% else %}
-                  <span class="estado-badge bg-secondary text-white">Inactivo</span>
-                {% endif %}
+        {% if establecimientos %}
+        {% for est in establecimientos %}
+        <a href="{% url 'establecimientos:detalle_establecimiento' est.id %}" class="text-decoration-none">
+          <div class="info-row" style="cursor:pointer; transition:.2s;" onmouseover="this.style.background='#fff8f5'"
+            onmouseout="this.style.background='transparent'">
+            <div class="d-flex align-items-center gap-3">
+              {% if est.imagen %}
+              <img src="{{ est.imagen.url }}" style="width:45px; height:45px; border-radius:12px; object-fit:cover;">
+              {% else %}
+              <div style="width:45px; height:45px; border-radius:12px; 
+                              background:#fff3e0; display:flex; align-items:center; 
+                              justify-content:center; font-size:1.3rem;">🏪</div>
+              {% endif %}
+              <div>
+                <span class="fw-semibold text-dark">{{ est.nombre }}</span>
+                <div class="text-muted small">{{ est.direccion }}</div>
               </div>
-            {% endfor %}
-          {% else %}
-            <p class="text-muted text-center small py-3">
-              No tienes establecimientos registrados.
-            </p>
-          {% endif %}
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              {% if est.activo %}
+              <span class="estado-badge bg-success text-white">Activo</span>
+              {% else %}
+              <span class="estado-badge bg-secondary text-white">Inactivo</span>
+              {% endif %}
+              <i class="fas fa-chevron-right text-muted small"></i>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+        <div class="text-center mt-3">
+          <a href="{% url 'establecimientos:crear_establecimiento' %}" class="btn btn-ver">
+            <i class="fas fa-plus me-1"></i> Agregar establecimiento
+          </a>
+        </div>
+        {% else %}
+        <div class="text-center py-3 text-muted">
+          <div style="font-size:2.5rem;">🏪</div>
+          <p class="small mt-2">No tienes establecimientos registrados.</p>
+          <a href="{% url 'establecimientos:crear_establecimiento' %}" class="btn btn-ver">
+            Crear mi primer establecimiento
+          </a>
+        </div>
+        {% endif %}
         {% endwith %}
       </div>
     </div>
     {% endif %}
-
-  </div>
-</div>
-{% endblock %}
+    {% endblock %}

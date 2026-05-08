@@ -5,6 +5,8 @@ from django.urls import reverse
 from django.views.generic import ListView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
+from django.db.models import Q
+from django.core.exceptions import PermissionDenied
 from .models import Pedido, ItemPedido
 from .forms import PedidoForm, ItemPedidoForm, EstadoPedidoForm
 from establecimientos.models import Establecimiento, Producto
@@ -124,6 +126,13 @@ def limpiar_carrito(request):
     return redirect('establecimientos:lista_establecimientos')
 
 
+class ComercioRequiredMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or request.user.tipo != 'comercio':
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+
 # ========== VISTAS PRINCIPALES ==========
 class MisPedidosView(LoginRequiredMixin, ListView):
     """Vista para que los usuarios vean sus pedidos"""
@@ -134,16 +143,6 @@ class MisPedidosView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Pedido.objects.filter(usuario=self.request.user).order_by('-creado_en')
-
-
-class DetallePedidoView(LoginRequiredMixin, DetailView):
-    """Vista para ver detalles de un pedido"""
-    model = Pedido
-    template_name = 'pedidos/detalle_pedido.html'
-    context_object_name = 'pedido'
-
-    def get_queryset(self):
-        return Pedido.objects.filter(usuario=self.request.user)
 
 
 @login_required
@@ -205,7 +204,7 @@ def crear_pedido(request, establecimiento_id):
     return render(request, 'pedidos/crear_pedido.html', context)
 
 
-class GestionarPedidosView(LoginRequiredMixin, ListView):
+class GestionarPedidosView(ComercioRequiredMixin, LoginRequiredMixin, ListView):
     """Vista para que el personal del establecimiento gestione pedidos"""
     model = Pedido
     template_name = 'pedidos/gestionar_pedidos.html'
@@ -213,17 +212,68 @@ class GestionarPedidosView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        # Mostrar todos los pedidos
-        return Pedido.objects.all().order_by('-creado_en')
+        return Pedido.objects.filter(
+            establecimiento__propietario=self.request.user
+        ).order_by('-creado_en')
 
 
-class ActualizarEstadoPedidoView(LoginRequiredMixin, UpdateView):
+class DetallePedidoView(LoginRequiredMixin, DetailView):
+    """Vista para ver detalles de un pedido"""
+    model = Pedido
+    template_name = 'pedidos/detalle_pedido.html'
+    context_object_name = 'pedido'
+
+    def get_queryset(self):
+        return Pedido.objects.filter(
+            Q(usuario=self.request.user) |
+            Q(establecimiento__propietario=self.request.user)
+        )
+
+
+class ActualizarEstadoPedidoView(ComercioRequiredMixin, LoginRequiredMixin, UpdateView):
     """Vista para actualizar el estado de un pedido"""
     model = Pedido
     form_class = EstadoPedidoForm
     template_name = 'pedidos/actualizar_estado.html'
     success_url = '/pedidos/gestionar/'
 
+    def get_queryset(self):
+        return Pedido.objects.filter(establecimiento__propietario=self.request.user)
+
     def form_valid(self, form):
         messages.success(self.request, f'Estado del pedido actualizado a: {form.instance.get_estado_display()}')
         return super().form_valid(form)
+
+
+@login_required
+def aceptar_pedido(request, pk):
+    if request.user.tipo != 'comercio':
+        raise PermissionDenied
+
+    pedido = get_object_or_404(
+        Pedido,
+        pk=pk,
+        establecimiento__propietario=request.user,
+        estado='recibido'
+    )
+    pedido.estado = 'en_preparacion'
+    pedido.save()
+    messages.success(request, 'Pedido aceptado y enviado a preparación.')
+    return redirect('pedidos:gestionar_pedidos')
+
+
+@login_required
+def marcar_listo_pedido(request, pk):
+    if request.user.tipo != 'comercio':
+        raise PermissionDenied
+
+    pedido = get_object_or_404(
+        Pedido,
+        pk=pk,
+        establecimiento__propietario=request.user,
+        estado='en_preparacion'
+    )
+    pedido.estado = 'listo'
+    pedido.save()
+    messages.success(request, 'Pedido marcado como listo.')
+    return redirect('pedidos:gestionar_pedidos')

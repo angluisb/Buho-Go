@@ -1,6 +1,9 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import Establecimiento, Producto
+from .forms import EstablecimientoForm, ProductoForm
 
 
 def _get_carrito(request):
@@ -67,6 +70,62 @@ class ListaEstablecimientosView(ListView):
         return Establecimiento.objects.filter(activo=True)
 
 
+class ComercioRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.tipo == 'comercio'
+
+    def handle_no_permission(self):
+        return redirect('home')
+
+
+class MisEstablecimientosView(ComercioRequiredMixin, ListView):
+    """Lista los establecimientos del comercio que inició sesión"""
+    model = Establecimiento
+    template_name = 'establecimientos/mis_establecimientos.html'
+    context_object_name = 'establecimientos'
+    paginate_by = 12
+
+    def get_queryset(self):
+        return Establecimiento.objects.filter(propietario=self.request.user)
+
+
+class CrearEstablecimientoView(ComercioRequiredMixin, CreateView):
+    model = Establecimiento
+    form_class = EstablecimientoForm
+    template_name = 'establecimientos/crear_establecimiento.html'
+    success_url = reverse_lazy('establecimientos:mis_establecimientos')
+
+    def form_valid(self, form):
+        form.instance.propietario = self.request.user
+        return super().form_valid(form)
+
+
+class CrearProductoView(ComercioRequiredMixin, CreateView):
+    model = Producto
+    form_class = ProductoForm
+    template_name = 'establecimientos/crear_producto.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.establecimiento = get_object_or_404(
+            Establecimiento,
+            pk=kwargs['establecimiento_id'],
+            propietario=request.user
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.establecimiento = self.establecimiento
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['establecimiento'] = self.establecimiento
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('establecimientos:detalle_establecimiento', kwargs={'pk': self.establecimiento.pk})
+
+
 class DetalleEstablecimientoView(DetailView):
     """Detalle de un establecimiento con productos y carrito"""
     model = Establecimiento
@@ -92,3 +151,30 @@ class DetalleEstablecimientoView(DetailView):
         context['carrito_total'] = carrito_total
         
         return context
+
+
+class EditarProductoView(ComercioRequiredMixin, UpdateView):
+    model = Producto
+    form_class = ProductoForm
+    template_name = 'establecimientos/editar_producto.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.establecimiento = get_object_or_404(
+            Establecimiento,
+            pk=kwargs['establecimiento_id'],
+            propietario=request.user
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Solo puede editar productos de sus propios establecimientos
+        return Producto.objects.filter(establecimiento__propietario=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['establecimiento'] = self.establecimiento
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('establecimientos:detalle_establecimiento', 
+                        kwargs={'pk': self.establecimiento.pk})

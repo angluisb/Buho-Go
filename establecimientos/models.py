@@ -1,6 +1,9 @@
 from django.db import models
+from django.conf import settings
 
 class Establecimiento(models.Model):
+    propietario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='establecimientos')  
+    imagen = models.ImageField(upload_to='establecimientos/', blank=True, null=True)
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True)
     direccion = models.CharField(max_length=300)
