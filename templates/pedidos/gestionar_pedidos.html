@@ -25,7 +25,7 @@
                     {% for pedido in pedidos %}
                         <tr>
                             <td>{{ pedido.id }}</td>
-                            <td>{{ pedido.usuario.email }}</td>
+                            <td>{{ pedido.usuario.get_full_name|default:pedido.usuario.username }}</td>
                             <td>{{ pedido.establecimiento.nombre }}</td>
                             <td>
                                 <span class="badge
