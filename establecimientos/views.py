@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import Establecimiento, Producto
 from .forms import EstablecimientoForm, ProductoForm
 
@@ -151,3 +151,30 @@ class DetalleEstablecimientoView(DetailView):
         context['carrito_total'] = carrito_total
         
         return context
+
+
+class EditarProductoView(ComercioRequiredMixin, UpdateView):
+    model = Producto
+    form_class = ProductoForm
+    template_name = 'establecimientos/editar_producto.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.establecimiento = get_object_or_404(
+            Establecimiento,
+            pk=kwargs['establecimiento_id'],
+            propietario=request.user
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Solo puede editar productos de sus propios establecimientos
+        return Producto.objects.filter(establecimiento__propietario=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['establecimiento'] = self.establecimiento
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('establecimientos:detalle_establecimiento', 
+                        kwargs={'pk': self.establecimiento.pk})
